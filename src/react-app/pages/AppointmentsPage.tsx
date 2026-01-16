@@ -1,4 +1,4 @@
-export default AppointmentsPage;
+
 
 /**
  * @description Página de agendamento aprimorada para Hermida Maia Advocacia.
@@ -437,6 +437,11 @@ const AppointmentsPage = () => {
     </div>
   );
 };
+
+
+
+
+export default AppointmentsPage;
 
 
 
