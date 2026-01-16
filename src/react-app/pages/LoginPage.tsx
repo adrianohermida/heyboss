@@ -8,73 +8,38 @@
  */
 
 import React, { useState, useEffect } from "react";
-import { useAuth } from "@hey-boss/users-service/react";
-import { useNavigate } from "react-router-dom";
-import { Mail, Lock, ArrowRight, Loader2, Chrome } from "lucide-react";
+import { supabase } from '../../supabaseClient';
+import { useNavigate, Link } from "react-router-dom";
+import { Mail, Lock, ArrowRight, Loader2 } from "lucide-react";
 
 const LoginPage = () => {
-  const { popupLogin, sendOTP, verifyOTP, user } = useAuth();
-  const navigate = useNavigate();
   const [email, setEmail] = useState("");
-  const [otp, setOtp] = useState("");
-  const [step, setStep] = useState<"email" | "otp">("email");
+  const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
 
-  // Redirecionamento automático após login baseado no perfil (Admin -> /admin, Outros -> /portal)
   useEffect(() => {
-    if (user) {
-      if ((user as any).isAdmin) {
-        navigate("/admin", { replace: true });
-      } else {
-        navigate("/portal", { replace: true });
+    const sessionCheck = async () => {
+      const { data } = await supabase.auth.getSession();
+      if (data.session) {
+        navigate("/dashboard", { replace: true });
       }
-    }
-  }, [user, navigate]);
+    };
+    sessionCheck();
+  }, [navigate]);
 
-  const handleGoogleLogin = async () => {
-    try {
-      await popupLogin();
-    } catch (err) {
-      setError("Falha ao entrar com Google. Tente novamente.");
-    }
-  };
-
-  const handleSendOTP = async (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     setError("");
-    try {
-      const res = await sendOTP(email);
-      if (res.success) {
-        setStep("otp");
-      } else {
-        setError(res.error || "Erro ao enviar código.");
-      }
-    } catch (err) {
-      setError("Erro de conexão.");
-    } finally {
-      setLoading(false);
+    const { error } = await supabase.auth.signInWithPassword({ email, password });
+    if (error) {
+      setError(error.message);
+    } else {
+      navigate("/dashboard", { replace: true });
     }
-  };
-
-  const handleVerifyOTP = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setLoading(true);
-    setError("");
-    try {
-      const res = await verifyOTP(email, otp);
-      if (res.success) {
-        // O useEffect cuidará do redirecionamento baseado no status de admin
-        console.log("OTP verificado com sucesso");
-      } else {
-        setError(res.error || "Código inválido.");
-      }
-    } catch (err) {
-      setError("Erro de verificação.");
-    } finally {
-      setLoading(false);
-    }
+    setLoading(false);
   };
 
   return (
@@ -96,73 +61,42 @@ const LoginPage = () => {
           </div>
         )}
 
-        <div className="space-y-4">
-          <button
-            onClick={handleGoogleLogin}
-            disabled={loading}
-            className="w-full flex items-center justify-center gap-3 bg-white text-brand-dark px-6 py-4 rounded-xl font-bold transition-all hover:bg-white/90 active:scale-95 disabled:opacity-50"
-          >
-            <Chrome size={20} />
-            Entrar com Google
-          </button>
 
-          <div className="relative flex items-center py-4">
-            <div className="flex-grow border-t border-white/10"></div>
-            <span className="flex-shrink mx-4 text-white/20 text-xs font-bold uppercase tracking-widest">Ou via E-mail</span>
-            <div className="flex-grow border-t border-white/10"></div>
+        <form onSubmit={handleLogin} className="space-y-4">
+          <div className="relative">
+            <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-white/30" size={20} />
+            <input
+              type="email"
+              required
+              placeholder="seu@email.com"
+              value={email}
+              onChange={e => setEmail(e.target.value)}
+              className="w-full bg-brand-dark border border-white/10 rounded-xl py-4 pl-12 pr-4 text-white focus:border-brand-primary outline-none transition-all"
+            />
           </div>
-
-          {step === "email" ? (
-            <form onSubmit={handleSendOTP} className="space-y-4">
-              <div className="relative">
-                <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-white/30" size={20} />
-                <input
-                  type="email"
-                  required
-                  placeholder="seu@email.com"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  className="w-full bg-brand-dark border border-white/10 rounded-xl py-4 pl-12 pr-4 text-white focus:border-brand-primary outline-none transition-all"
-                />
-              </div>
-              <button
-                type="submit"
-                disabled={loading}
-                className="w-full bg-brand-primary hover:bg-brand-primary/90 text-white py-4 rounded-xl font-bold flex items-center justify-center gap-2 transition-all active:scale-95 disabled:opacity-50"
-              >
-                {loading ? <Loader2 className="animate-spin" size={20} /> : "Enviar Código de Acesso"}
-                <ArrowRight size={20} />
-              </button>
-            </form>
-          ) : (
-            <form onSubmit={handleVerifyOTP} className="space-y-4">
-              <div className="relative">
-                <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-white/30" size={20} />
-                <input
-                  type="text"
-                  required
-                  placeholder="Digite o código de 6 dígitos"
-                  value={otp}
-                  onChange={(e) => setOtp(e.target.value)}
-                  className="w-full bg-brand-dark border border-white/10 rounded-xl py-4 pl-12 pr-4 text-white focus:border-brand-primary outline-none transition-all text-center tracking-[0.5em] font-mono text-xl"
-                />
-              </div>
-              <button
-                type="submit"
-                disabled={loading}
-                className="w-full bg-brand-primary hover:bg-brand-primary/90 text-white py-4 rounded-xl font-bold flex items-center justify-center gap-2 transition-all active:scale-95 disabled:opacity-50"
-              >
-                {loading ? <Loader2 className="animate-spin" size={20} /> : "Verificar e Entrar"}
-              </button>
-              <button
-                type="button"
-                onClick={() => setStep("email")}
-                className="w-full text-white/40 text-sm hover:text-white transition-colors"
-              >
-                Alterar e-mail
-              </button>
-            </form>
-          )}
+          <div className="relative">
+            <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-white/30" size={20} />
+            <input
+              type="password"
+              required
+              placeholder="Senha"
+              value={password}
+              onChange={e => setPassword(e.target.value)}
+              className="w-full bg-brand-dark border border-white/10 rounded-xl py-4 pl-12 pr-4 text-white focus:border-brand-primary outline-none transition-all"
+            />
+          </div>
+          <button
+            type="submit"
+            disabled={loading}
+            className="w-full bg-brand-primary hover:bg-brand-primary/90 text-white py-4 rounded-xl font-bold flex items-center justify-center gap-2 transition-all active:scale-95 disabled:opacity-50"
+          >
+            {loading ? <Loader2 className="animate-spin" size={20} /> : "Entrar"}
+            <ArrowRight size={20} />
+          </button>
+        </form>
+        <div className="flex flex-col gap-2 mt-4">
+          <Link to="/register" className="text-brand-primary text-sm hover:underline text-center">Criar conta</Link>
+          <Link to="/forgot-password" className="text-white/40 text-xs hover:underline text-center">Esqueceu a senha?</Link>
         </div>
 
         <p className="text-center text-[10px] text-white/20">
