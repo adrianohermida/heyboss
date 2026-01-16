@@ -217,9 +217,12 @@ const AppointmentsPage = () => {
                 <p className="text-white/60 mb-8 max-w-xs">
                   Para garantir a segurança e o sigilo do seu atendimento, é necessário criar uma conta gratuita antes de agendar.
                 </p>
-                <Link to="/login" className="bg-brand-primary text-white px-10 py-4 rounded-xl font-bold text-lg hover:scale-105 transition-all shadow-xl shadow-brand-primary/20">
-                  Entrar ou Criar Conta
+                <Link to="/register" className="bg-brand-primary text-white px-10 py-4 rounded-xl font-bold text-lg hover:scale-105 transition-all shadow-xl shadow-brand-primary/20">
+                  Criar Conta Gratuita
                 </Link>
+                <p className="text-white/40 text-xs mt-4">
+                  Já tem conta? <Link to="/login" className="text-brand-primary font-bold underline">Entrar</Link>
+                </p>
               </div>
             )}
 
