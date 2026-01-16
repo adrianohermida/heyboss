@@ -55,7 +55,6 @@ const AppointmentsPage = () => {
         if (data.length > 0) setSelectedProf(data[0]);
       });
   }, []);
-
   // Carregar slots quando data, profissional ou tipo mudar
   useEffect(() => {
     if (selectedDate && selectedProf) {
@@ -433,9 +432,13 @@ const AppointmentsPage = () => {
           </div>
         </div>
       </main>
+
     </div>
-  
-};\n\nexport default AppointmentsPage;
+  );
+};
+
+
+
 
 
 

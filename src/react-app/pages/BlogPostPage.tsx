@@ -243,7 +243,7 @@ const BlogPostPage = () => {
       `}</style>
     </div>
   
-};\n\nexport default BlogPostPage;
+};
 
 
 

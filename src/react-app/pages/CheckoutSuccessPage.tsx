@@ -171,6 +171,6 @@ export const CheckoutSuccessPage: React.FC = () => {
       </div>
     </div>
   );
-export default CheckoutSuccessPage
+
 
 

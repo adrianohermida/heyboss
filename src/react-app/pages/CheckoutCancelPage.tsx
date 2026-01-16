@@ -47,6 +47,6 @@ export const CheckoutCancelPage: React.FC = () => {
       </div>
     </div>
   );
-export default CheckoutCancelPage
+
 
 
