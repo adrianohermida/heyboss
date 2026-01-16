@@ -1,5 +1,18 @@
 
 import React, { useState, useEffect } from 'react';
+// Configuração dinâmica do widget de chat Freshworks
+function configureChatWidget(user: any) {
+  if (window.fcWidget) {
+    if (user?.id) window.fcWidget.setExternalId(user.id);
+    if (user?.name) window.fcWidget.user.setFirstName(user.name);
+    if (user?.email) window.fcWidget.user.setEmail(user.email);
+    // Exemplo de propriedades extras
+    window.fcWidget.user.setProperties({
+      cf_plan: user?.plan || 'Free',
+      cf_status: user?.status || 'Active',
+    });
+  }
+}
 import Header from '../components/Header';
 import { useAuth } from '@hey-boss/users-service/react';
 import { CustomForm } from '../components/CustomForm';
@@ -108,6 +121,13 @@ const ClientPortal = () => {
   useEffect(() => {
     fetchSummary();
   }, []);
+
+  // Inicializa/configura widget de chat ao carregar usuário
+  useEffect(() => {
+    if (typeof window !== 'undefined' && window.fcWidget && user) {
+      configureChatWidget(user);
+    }
+  }, [user]);
 
   useEffect(() => {
     if (activeTab !== 'overview' && activeTab !== 'tickets' && activeTab !== 'agenda') {
