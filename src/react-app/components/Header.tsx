@@ -61,11 +61,10 @@ const Header = () => {
           {/* Desktop Navigation */}
           <nav className="hidden lg:flex items-center gap-8">
             <Link to="/" className="text-white/80 hover:text-brand-primary transition-colors text-sm font-medium">Início</Link>
-            <Link to="/about" className="text-white/80 hover:text-brand-primary transition-colors text-sm font-medium">Sobre</Link>
+            <Link to="/sobre" className="text-white/80 hover:text-brand-primary transition-colors text-sm font-medium">Sobre</Link>
             <a href="/#serviços" className="text-white/80 hover:text-brand-primary transition-colors text-sm font-medium">Serviços</a>
             <Link to="/blog" className="text-white/80 hover:text-brand-primary transition-colors text-sm font-medium">Blog</Link>
-            <Link to="/contact" className="text-white/80 hover:text-brand-primary transition-colors text-sm font-medium">Contato</Link>
-            <Link to="/appointments" className="text-white/80 hover:text-brand-primary transition-colors text-sm font-medium">Agendar Consulta</Link>
+            <Link to="/contato" className="text-white/80 hover:text-brand-primary transition-colors text-sm font-medium">Contato</Link>
             
             {user ? (
               <div className="relative" ref={menuRef}>
@@ -173,11 +172,10 @@ const Header = () => {
         <div className="lg:hidden fixed inset-0 top-20 bg-brand-dark/95 backdrop-blur-xl z-40 animate-in slide-in-from-top duration-300 border-t border-white/5">
           <nav className="flex flex-col p-6 gap-6 overflow-y-auto max-h-[calc(100vh-5rem)]">
             <Link to="/" onClick={() => setIsMobileMenuOpen(false)} className="text-xl text-white font-bold border-b border-white/5 pb-4">Início</Link>
-            <Link to="/about" onClick={() => setIsMobileMenuOpen(false)} className="text-xl text-white font-bold border-b border-white/5 pb-4">Sobre</Link>
+            <Link to="/sobre" onClick={() => setIsMobileMenuOpen(false)} className="text-xl text-white font-bold border-b border-white/5 pb-4">Sobre</Link>
             <a href="/#serviços" onClick={() => setIsMobileMenuOpen(false)} className="text-xl text-white font-bold border-b border-white/5 pb-4">Serviços</a>
             <Link to="/blog" onClick={() => setIsMobileMenuOpen(false)} className="text-xl text-white font-bold border-b border-white/5 pb-4">Blog</Link>
-            <Link to="/contact" onClick={() => setIsMobileMenuOpen(false)} className="text-xl text-white font-bold border-b border-white/5 pb-4">Contato</Link>
-            <Link to="/appointments" onClick={() => setIsMobileMenuOpen(false)} className="text-xl text-white font-bold border-b border-white/5 pb-4">Agendar Consulta</Link>
+            <Link to="/contato" onClick={() => setIsMobileMenuOpen(false)} className="text-xl text-white font-bold border-b border-white/5 pb-4">Contato</Link>
             
             {!user && (
               <Link to="/login" onClick={() => setIsMobileMenuOpen(false)} className="bg-brand-primary text-white text-center py-4 rounded-xl font-bold text-lg mt-4">
