@@ -6,18 +6,30 @@
  *             Utiliza CustomForm para persistência no banco de dados D1.
  */
 
+
 import React, { useState, useEffect } from 'react';
 import Header from '../components/Header';
 import { CustomForm } from '../components/CustomForm';
 import { contactFormTheme } from '../components/CustomForm/themes';
 import allConfigs from '../../shared/form-configs.json';
 import { User, Shield, Phone, Briefcase, Loader2, CheckCircle2 } from 'lucide-react';
+import { useAuth } from '../auth/supabaseAuth';
+
+
+const adminEmails = ["adrianohermida@gmail.com", "contato@hermidamaia.adv.br", "admin@example.com"];
 
 const ProfilePage = () => {
+  const { user: supaUser } = useAuth();
   const [profile, setProfile] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState<{ type: 'success' | 'error', text: string } | null>(null);
+
+  // Detecta tipo de usuário
+  const email = (supaUser?.email || '').toLowerCase();
+  const isAdmin = adminEmails.includes(email);
+  const isColaborador = !isAdmin && email.endsWith('@hermidamaia.adv.br');
+  const isCliente = !isAdmin && !isColaborador;
 
   useEffect(() => {
     fetch('/api/user/profile')
@@ -63,8 +75,12 @@ const ProfilePage = () => {
       <Header />
       <main className="pt-32 pb-24 px-4 sm:px-6 lg:px-8 max-w-4xl mx-auto">
         <div className="mb-12">
-          <h1 className="text-3xl font-extrabold">Meu Perfil Profissional</h1>
-          <p className="text-white/50 mt-1">Mantenha seus dados atualizados para o sistema do escritório.</p>
+          <h1 className="text-3xl font-extrabold">Meu Perfil</h1>
+          <p className="text-white/50 mt-1">
+            {isAdmin && 'Administrador do Escritório'}
+            {isColaborador && 'Colaborador do Escritório'}
+            {isCliente && 'Cliente'}
+          </p>
         </div>
 
         <div className="grid md:grid-cols-3 gap-8">
@@ -73,8 +89,12 @@ const ProfilePage = () => {
               <div className="w-24 h-24 bg-brand-primary/20 rounded-full flex items-center justify-center mx-auto mb-4">
                 <User className="text-brand-primary" size={48} />
               </div>
-              <h2 className="font-bold text-lg">{profile?.user_email}</h2>
-              <p className="text-white/40 text-xs uppercase tracking-widest mt-1">Advogado / Equipe</p>
+              <h2 className="font-bold text-lg">{profile?.user_email || email}</h2>
+              <p className="text-white/40 text-xs uppercase tracking-widest mt-1">
+                {isAdmin && 'Administrador'}
+                {isColaborador && 'Colaborador'}
+                {isCliente && 'Cliente'}
+              </p>
             </div>
 
             <div className="bg-brand-elevated p-6 rounded-2xl border border-white/5 space-y-4">
@@ -82,10 +102,12 @@ const ProfilePage = () => {
                 <Shield className="text-brand-primary" size={18} />
                 <span className="text-white/60">Acesso Verificado</span>
               </div>
-              <div className="flex items-center gap-3 text-sm">
-                <Briefcase className="text-brand-primary" size={18} />
-                <span className="text-white/60">{profile?.area_atuacao || 'Área não definida'}</span>
-              </div>
+              {isAdmin || isColaborador ? (
+                <div className="flex items-center gap-3 text-sm">
+                  <Briefcase className="text-brand-primary" size={18} />
+                  <span className="text-white/60">{profile?.area_atuacao || 'Área não definida'}</span>
+                </div>
+              ) : null}
             </div>
           </div>
 
@@ -98,10 +120,30 @@ const ProfilePage = () => {
                 </div>
               )}
 
-              <CustomForm 
+              {/* LGPD Notice */}
+              <div className="mb-6 p-4 rounded-xl bg-brand-primary/10 border border-brand-primary/20 text-xs text-brand-primary">
+                <b>LGPD:</b> Seus dados pessoais são utilizados apenas para identificação e contato. Você pode editar ou remover seus dados, exceto o e-mail, que é usado como identificador único.
+              </div>
+
+              <CustomForm
                 id="profile_form"
-                schema={allConfigs.profile_form.jsonSchema}
-                formData={profile || {}}
+                schema={{
+                  ...allConfigs.profile_form.jsonSchema,
+                  properties: {
+                    ...allConfigs.profile_form.jsonSchema.properties,
+                    user_email: {
+                      ...allConfigs.profile_form.jsonSchema.properties.user_email,
+                      readOnly: true,
+                      description: 'E-mail não pode ser alterado.'
+                    },
+                    ...(isCliente ? {
+                      oab_numero: { ...allConfigs.profile_form.jsonSchema.properties.oab_numero, hidden: true },
+                      area_atuacao: { ...allConfigs.profile_form.jsonSchema.properties.area_atuacao, hidden: true }
+                    } : {})
+                  },
+                  required: ["user_email"]
+                }}
+                formData={{ ...profile, user_email: email }}
                 onSubmit={handleSave}
                 theme={contactFormTheme}
                 labels={{ submit: saving ? 'Salvando...' : 'Salvar Alterações' }}
