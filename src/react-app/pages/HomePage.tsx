@@ -67,6 +67,9 @@ const Hero = () => (
             <Link to="/appointments" className="hidden sm:flex w-full sm:w-auto bg-white/5 hover:bg-white/10 text-white border border-white/10 px-8 py-4 rounded-xl font-bold text-lg transition-all items-center justify-center">
               Agendar Consulta
             </Link>
+            <Link to="/contact" className="hidden sm:flex w-full sm:w-auto bg-brand-accent/10 hover:bg-brand-accent/20 text-brand-accent border border-brand-accent/20 px-8 py-4 rounded-xl font-bold text-lg transition-all items-center justify-center">
+              Fale Conosco
+            </Link>
           </div>
 
           <div className="flex items-center gap-6 justify-center lg:justify-start pt-4">
@@ -777,6 +780,7 @@ const Footer = () => {
             <li><a href="#calculadora" className="hover:text-brand-primary transition-colors">Calculadora Gratuita</a></li>
             <li><Link to="/blog" className="hover:text-brand-primary transition-colors">Blog e Notícias</Link></li>
             <li><Link to="/appointments" className="hover:text-brand-primary transition-colors">Agendar Consulta</Link></li>
+            <li><Link to="/contact" className="hover:text-brand-primary transition-colors">Contato</Link></li>
           </ul>
         </div>
 
