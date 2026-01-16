@@ -560,7 +560,7 @@ const VideoJourney = () => {
               <p className="text-white/70 text-lg mb-10">Agora que você conhece seus direitos, escolha como deseja recuperar sua paz financeira:</p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
                 <Link 
-                  to="/agendar"
+                  to="/appointments"
                   className="bg-brand-primary hover:bg-brand-primary/90 text-white px-8 py-5 rounded-2xl font-extrabold text-lg transition-all hover:scale-105 shadow-xl shadow-brand-primary/20 flex items-center justify-center gap-2"
                 >
                   <Calendar size={20} />
@@ -703,7 +703,7 @@ const FinalCTA = () => (
 
         {/* BOTÃO DIREITO – AGENDA */}
         <Link
-          to="/agendar"
+          to="/appointments"
           className="bg-white text-brand-primary px-10 py-5 rounded-2xl font-extrabold text-xl shadow-2xl transition-all hover:scale-105 active:scale-95 text-center"
         >
           Agendar avaliação
