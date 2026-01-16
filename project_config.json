@@ -1,4 +1,10 @@
 
 {
-    "enable_e_commerce": true
+    "enable_e_commerce": true,
+    "servers": {
+        "supabase": {
+            "type": "http",
+            "url": "https://mcp.supabase.com/mcp?project_ref=sspvizogbcyigquqycsz&features=docs%2Caccount%2Cdatabase%2Cdebugging%2Cdevelopment%2Cfunctions%2Cbranching%2Cstorage"
+        }
+    }
 }
