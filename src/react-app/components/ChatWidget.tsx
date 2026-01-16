@@ -1,6 +1,3 @@
-
-
-
 /**
  * @description Componente de Widget de Chat com IA para atendimento ao público.
  *             Permite FAQ, consulta de status de processos/tickets e abertura de chamados.
@@ -19,6 +16,8 @@ interface Message {
   type?: 'text' | 'status' | 'form';
   data?: any;
 }
+
+const WORKER_AI_URL = "https://calm-heart-41f6.adrianohermida.workers.dev";
 
 export const ChatWidget = () => {
   const { user, isAuthenticated } = useAuth();
@@ -87,7 +86,6 @@ export const ChatWidget = () => {
     const messageText = overrideInput || input;
     if (!messageText.trim() || isLoading) return;
 
-    // Ensure we have a session ID before sending
     let currentSessionId = sessionId;
     if (!currentSessionId) {
       currentSessionId = crypto.randomUUID();
@@ -106,41 +104,42 @@ export const ChatWidget = () => {
     setIsLoading(true);
 
     try {
-      const response = await fetch('/api/ai/chat', {
+      // Envia o histórico para o Worker AI
+      const payload = {
+        messages: [
+          { role: 'system', content: 'Você é um assistente jurídico útil e cordial.' },
+          ...messages.map(m => ({ role: m.role, content: m.content })),
+          { role: 'user', content: messageText }
+        ],
+        session_id: currentSessionId,
+        user: user?.email || undefined
+      };
+      const response = await fetch(WORKER_AI_URL, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ 
-          message: messageText,
-          history: messages.map(m => ({ role: m.role, content: m.content })),
-          session_id: currentSessionId
-        })
+        body: JSON.stringify(payload)
       });
-
-      if (!response.ok) {
-        throw new Error('Falha na resposta do servidor');
-      }
-
+      if (!response.ok) throw new Error('Falha na resposta do Worker AI');
       const data = await response.json();
-      
-      if (data.session_id) {
-        setSessionId(data.session_id);
-        sessionStorage.setItem('chat_session_id', data.session_id);
+      // Espera resposta no formato { response: { choices: [{ message: { content } }] } } ou similar
+      let reply = '';
+      if (Array.isArray(data)) {
+        // Worker retorna array de tasks
+        reply = data[data.length - 1]?.response?.choices?.[0]?.message?.content || data[data.length - 1]?.response?.output || 'Desculpe, não consegui responder.';
+      } else {
+        reply = data?.response?.choices?.[0]?.message?.content || data?.response?.output || data?.reply || 'Desculpe, não consegui responder.';
       }
-      
       const assistantMessage: Message = {
         role: 'assistant',
-        content: data.reply || 'Desculpe, tive um problema ao processar sua solicitação.',
+        content: reply,
         timestamp: new Date(),
-        type: data.type,
-        data: data.data
       };
-
       setMessages(prev => [...prev, assistantMessage]);
     } catch (error) {
       console.error("Chat Error:", error);
       setMessages(prev => [...prev, {
         role: 'assistant',
-        content: 'Erro de conexão. Por favor, tente novamente mais tarde.',
+        content: 'Erro de conexão com o assistente. Por favor, tente novamente mais tarde.',
         timestamp: new Date()
       }]);
     } finally {
