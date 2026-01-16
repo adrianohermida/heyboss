@@ -1,3 +1,6 @@
+const AboutPage2 = lazy(() => import('./pages/AboutPage2'));
+const ContactPage2 = lazy(() => import('./pages/ContactPage2'));
+const AppointmentsPage2 = lazy(() => import('./pages/AppointmentsPage2'));
 import { Routes, Route, useLocation } from 'react-router-dom'
 import { lazy, Suspense } from 'react'
 
@@ -52,7 +55,9 @@ export default function App() {
           <Route path="/blog" element={<BlogPage />} />
           <Route path="/blog/:slug" element={<BlogPostPage />} />
           <Route path="/about" element={<AboutPage />} />
+          <Route path="/about2" element={<AboutPage2 />} />
           <Route path="/contact" element={<ContactPage />} />
+          <Route path="/contact2" element={<ContactPage2 />} />
           <Route path="/unsubscribe" element={<UnsubscribePage />} />
           <Route path="/process/:id" element={<ProcessDetailPage />} />
           <Route path="/client-portal" element={<ClientPortal />} />
@@ -60,6 +65,7 @@ export default function App() {
           <Route path="/checkout/error" element={<CheckoutErrorPage />} />
           <Route path="/checkout/cancel" element={<CheckoutCancelPage />} />
           <Route path="/appointments" element={<AppointmentsPage />} />
+          <Route path="/appointments2" element={<AppointmentsPage2 />} />
           <Route path="/auth/callback" element={<AuthCallback />} />
           {/* Protected Routes */}
           <Route element={<AuthProtect />}>
