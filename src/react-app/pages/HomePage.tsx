@@ -64,7 +64,7 @@ const Hero = () => (
               Calcular Gratuitamente
               <ArrowRight size={20} className="group-hover:translate-x-1 transition-transform" />
             </button>
-            <Link to="/agendar" className="hidden sm:flex w-full sm:w-auto bg-white/5 hover:bg-white/10 text-white border border-white/10 px-8 py-4 rounded-xl font-bold text-lg transition-all items-center justify-center">
+            <Link to="/appointments" className="hidden sm:flex w-full sm:w-auto bg-white/5 hover:bg-white/10 text-white border border-white/10 px-8 py-4 rounded-xl font-bold text-lg transition-all items-center justify-center">
               Agendar Consulta
             </Link>
           </div>
@@ -773,10 +773,10 @@ const Footer = () => {
         <div>
           <h4 className="text-white font-bold mb-6">Links Úteis</h4>
           <ul className="space-y-4 text-sm text-white/50">
-            <li><Link to="/sobre" className="hover:text-brand-primary transition-colors">Sobre o Escritório</Link></li>
+            <li><Link to="/about" className="hover:text-brand-primary transition-colors">Sobre o Escritório</Link></li>
             <li><a href="#calculadora" className="hover:text-brand-primary transition-colors">Calculadora Gratuita</a></li>
             <li><Link to="/blog" className="hover:text-brand-primary transition-colors">Blog e Notícias</Link></li>
-            <li><Link to="/contato" className="hover:text-brand-primary transition-colors">Agendar Consulta</Link></li>
+            <li><Link to="/appointments" className="hover:text-brand-primary transition-colors">Agendar Consulta</Link></li>
           </ul>
         </div>
 
