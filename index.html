@@ -52,6 +52,41 @@
   <body>
     <div id="root"></div>
     <script type="module" src="/src/react-app/main.tsx"></script>
+    <!-- Widget de Chat e CRM Freshworks (fw-cdn.com) -->
+    <script src="//eu.fw-cdn.com/10713913/375987.js" chat="true"></script>
+    <script>
+      // Função para identificar usuário e setar propriedades no CRM
+      function setFwCrmUser(user) {
+        if (window.fwcrm && user) {
+          var new_contact = {
+            "First name": user.firstName || user.name || '',
+            "Last name": user.lastName || '',
+            "Email": user.email || '',
+            "Alternate contact number": user.altPhone || '',
+            "company": {
+              "Name": user.companyName || '',
+              "Website": user.companyWebsite || ''
+            }
+          };
+          var identifier = user.email || '';
+          window.fwcrm.identify(identifier, new_contact);
+
+          var sample_properties = {
+            "Address": user.address || '',
+            "City": user.city || '',
+            "Mobile": user.mobile || '',
+            "Alternate Contact Number": user.altPhone || ''
+          };
+          window.fwcrm.set(sample_properties);
+        }
+      }
+      // Exemplo: tente obter dados do usuário global (ajuste conforme integração real)
+      document.addEventListener('DOMContentLoaded', function() {
+        if (window.__HEYBOSS_USER__) {
+          setFwCrmUser(window.__HEYBOSS_USER__);
+        }
+      });
+    </script>
   
 
 

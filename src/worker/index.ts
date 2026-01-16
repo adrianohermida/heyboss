@@ -469,12 +469,16 @@ app.post("/api/admin/appointments/:id/status", authMiddleware, adminPermissionMi
 // =================================================================
 
 app.get("/api/admin/leads", authMiddleware, adminPermissionMiddleware, async (c) => {
+  const user = c.get("user");
   const { results } = await c.env.DB.prepare("SELECT * FROM customers ORDER BY created_at DESC").all();
+  await logAudit(c.env.DB, "leads", "list", user.email);
   return c.json(results);
 });
 
 app.get("/api/admin/processos", authMiddleware, adminPermissionMiddleware, async (c) => {
+  const user = c.get("user");
   const { results } = await c.env.DB.prepare("SELECT * FROM processos ORDER BY updated_at DESC").all();
+  await logAudit(c.env.DB, "processos", "list", user.email);
   return c.json(results);
 });
 
@@ -503,12 +507,16 @@ app.get("/api/processos/:id/details", authMiddleware, async (c) => {
 });
 
 app.get("/api/admin/faturas", authMiddleware, adminPermissionMiddleware, async (c) => {
+  const user = c.get("user");
   const { results } = await c.env.DB.prepare("SELECT * FROM faturas ORDER BY data_vencimento ASC").all();
+  await logAudit(c.env.DB, "faturas", "list", user.email);
   return c.json(results);
 });
 
 app.get("/api/admin/publicacoes", authMiddleware, adminPermissionMiddleware, async (c) => {
+  const user = c.get("user");
   const { results } = await c.env.DB.prepare("SELECT * FROM publicacoes ORDER BY data_publicacao DESC LIMIT 100").all();
+  await logAudit(c.env.DB, "publicacoes", "list", user.email);
   return c.json(results);
 });
 
