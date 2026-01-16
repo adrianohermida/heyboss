@@ -11,7 +11,25 @@
 import React, { useState, useEffect } from "react";
 import { supabase } from '../../supabaseClient';
 import { useNavigate, Link } from "react-router-dom";
-import { Mail, Lock, ArrowRight, Loader2, KeyRound, MailCheck } from "lucide-react";
+import { Mail, Lock, ArrowRight, Loader2, KeyRound, MailCheck, LogIn } from "lucide-react";
+  const [googleLoading, setGoogleLoading] = useState(false);
+  const handleGoogleLogin = async () => {
+    setGoogleLoading(true);
+    setError("");
+    try {
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider: 'google',
+        options: {
+          redirectTo: window.location.origin + '/auth/callback'
+        }
+      });
+      if (error) setError(error.message);
+    } catch (err: any) {
+      setError(err.message || 'Erro ao conectar com Google');
+    } finally {
+      setGoogleLoading(false);
+    }
+  };
 
 const LoginPage = () => {
   const [email, setEmail] = useState("");
@@ -78,6 +96,7 @@ const LoginPage = () => {
           </p>
         </div>
 
+
         {/* Login por e-mail/senha */}
         <div className="space-y-2">
           <form onSubmit={handleLogin} className="space-y-4">
@@ -115,6 +134,19 @@ const LoginPage = () => {
               <ArrowRight size={20} />
             </button>
           </form>
+        </div>
+
+        {/* Login social Google */}
+        <div className="mt-4">
+          <button
+            type="button"
+            onClick={handleGoogleLogin}
+            disabled={googleLoading}
+            className="w-full bg-white text-brand-primary border border-brand-primary/30 hover:bg-brand-primary/10 py-3 rounded-xl font-bold flex items-center justify-center gap-2 transition-all active:scale-95 disabled:opacity-50 text-sm shadow"
+          >
+            {googleLoading ? <Loader2 className="animate-spin" size={18} /> : <LogIn size={18} />}
+            Entrar com Google
+          </button>
         </div>
 
         {/* Login por link mágico */}
