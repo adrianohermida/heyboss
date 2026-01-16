@@ -31,8 +31,7 @@
 				{
 					"binding": "heyboss_db",
 					"database_name": "heyboss_db",
-					"database_id": "223d8197-7c2d-47ab-8b63-4adb9c2998c2",
-					"remote": true
+					"database_id": "223d8197-7c2d-47ab-8b63-4adb9c2998c2"
 				}
 			]
 		},
