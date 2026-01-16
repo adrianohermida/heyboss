@@ -138,6 +138,6 @@ export const UnsubscribePage: React.FC = () => {
       </footer>
     </div>
   );
-export default UnsubscribePage
+
 
 

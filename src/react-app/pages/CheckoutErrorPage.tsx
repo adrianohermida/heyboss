@@ -54,6 +54,6 @@ export const CheckoutErrorPage: React.FC = () => {
       </div>
     </div>
   );
-export default CheckoutErrorPage
+
 
 
