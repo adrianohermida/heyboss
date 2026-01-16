@@ -137,7 +137,9 @@ export const UnsubscribePage: React.FC = () => {
         </p>
       </footer>
     </div>
+
   );
+}
 
 
 

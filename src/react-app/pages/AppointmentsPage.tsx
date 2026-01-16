@@ -414,7 +414,7 @@ const AppointmentsPage = () => {
 
                 <CustomForm 
                   id="appointment_form"
-                  schema={allConfigs.appointment_form.jsonSchema}
+                  schema={allConfigs.appointment_form.jsonSchema as any}
                   formData={user ? { name: user.name, email: user.email } : {}}
                   onSubmit={handleSubmit}
                   theme={contactFormTheme}
