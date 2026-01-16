@@ -734,9 +734,17 @@ const ConfigModule = () => {
   const [isSaving, setIsSaving] = React.useState(false);
   const [showGuide, setShowGuide] = React.useState(true);
   const [activeSubTab, setActiveSubTab] = React.useState<'stripe' | 'google'>('stripe');
+  const [showGoogleModal, setShowGoogleModal] = React.useState(false);
 
   const handleConnectGoogle = () => {
+    setShowGoogleModal(true);
+  };
+  const confirmGoogleConnect = () => {
+    setShowGoogleModal(false);
     window.location.href = '/api/admin/google-calendar/connect';
+  };
+  const cancelGoogleConnect = () => {
+    setShowGoogleModal(false);
   };
 
   const handleTestConnection = async () => {
@@ -994,6 +1002,18 @@ const ConfigModule = () => {
                 <Chrome size={20} />
                 {status?.googleCalendar?.isConnected ? 'Reconectar Google Calendar' : 'Conectar Google Calendar'}
               </button>
+              {showGoogleModal && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60">
+                  <div className="bg-brand-elevated p-8 rounded-2xl shadow-2xl max-w-md w-full border border-brand-primary/30 animate-fade-in">
+                    <h2 className="text-2xl font-bold mb-4 flex items-center gap-2"><Chrome size={24} className="text-brand-primary" />Conectar Google Calendar</h2>
+                    <p className="text-white/80 mb-6">Você será redirecionado para o Google para autorizar o acesso à sua agenda. O sistema só poderá ler horários ocupados/livres e criar eventos em seu nome. Não acessamos e-mails ou dados privados.</p>
+                    <div className="flex gap-4 mt-6">
+                      <button onClick={confirmGoogleConnect} className="flex-1 bg-brand-primary hover:bg-brand-primary/90 text-white px-6 py-3 rounded-xl font-bold text-sm transition-all shadow-lg shadow-brand-primary/20">Autorizar e Prosseguir</button>
+                      <button onClick={cancelGoogleConnect} className="flex-1 bg-white/10 hover:bg-white/20 text-white px-6 py-3 rounded-xl font-bold text-sm transition-all">Cancelar</button>
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
 
             <div className="space-y-2 text-xs text-white/60 p-4 bg-white/5 rounded-lg border border-white/10">
