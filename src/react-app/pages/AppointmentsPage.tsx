@@ -7,7 +7,7 @@
  */
 
 import React, { useState, useEffect, useMemo } from 'react';
-import { Header } from '../components/Header';
+import Header from '../components/Header';
 import { CustomForm } from '../components/CustomForm';
 import { contactFormTheme } from '../components/CustomForm/themes';
 import allConfigs from '../../shared/form-configs.json';

@@ -9,7 +9,7 @@
 import React, { useEffect, useState } from 'react';
 import { useSearchParams, Link } from 'react-router-dom';
 import { MailX, CheckCircle2, AlertCircle, ArrowLeft, Loader2 } from 'lucide-react';
-import { Header } from '../components/Header';
+import Header from '../components/Header';
 
 export const UnsubscribePage: React.FC = () => {
   const [searchParams] = useSearchParams();

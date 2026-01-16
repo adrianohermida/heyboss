@@ -10,6 +10,8 @@
     /* Global loosest type checking */
     "skipLibCheck": true,
     "allowJs": true,
-    "noErrorTruncation": false
+    "noErrorTruncation": false,
+    "module": "esnext",
+    "target": "es2020"
   }
 }

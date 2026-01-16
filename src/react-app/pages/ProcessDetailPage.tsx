@@ -35,7 +35,7 @@ import {
   MessageCircle,
   TrendingDown
 } from 'lucide-react';
-import { Header } from '../components/Header';
+import Header from '../components/Header';
 import { cn } from '../utils';
 import { useAuth } from '@hey-boss/users-service/react';
 import { CustomForm } from '../components/CustomForm';

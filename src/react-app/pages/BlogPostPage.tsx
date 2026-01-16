@@ -22,7 +22,7 @@ import {
   ArrowRight,
   Mail
 } from 'lucide-react';
-import { Header } from '../components/Header';
+import Header from '../components/Header';
 import { CustomForm } from '../components/CustomForm';
 import allConfigs from '../../shared/form-configs.json';
 

@@ -1,6 +1,6 @@
 
 import React, { useState, useEffect } from 'react';
-import { Header } from '../components/Header';
+import Header from '../components/Header';
 import { useAuth } from '@hey-boss/users-service/react';
 import { CustomForm } from '../components/CustomForm';
 import allConfigs from '../../shared/form-configs.json';

@@ -18,7 +18,7 @@ import {
   Loader2,
   Filter
 } from 'lucide-react';
-import { Header } from '../components/Header';
+import Header from '../components/Header';
 
 const BlogPage = () => {
   const [posts, setPosts] = useState<any[]>([]);
