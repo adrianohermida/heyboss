@@ -11,6 +11,7 @@ import {
   getCurrentUser,
 } from "@hey-boss/users-service/backend";
 import { CustomerService } from "../shared/customers-service";
+import { jwtVerify } from 'jose';
 
 const app = new Hono<{
   Bindings: {
@@ -25,6 +26,29 @@ const app = new Hono<{
     STRIPE_CONNECT_ACCOUNT_ID?: string;
   };
 }>();
+
+// Cloudflare Access JWT validation middleware
+const CF_ACCESS_JWKS_URL = 'https://aetherlab.cloudflareaccess.com/cdn-cgi/access/certs';
+const CF_ACCESS_AUD = '8fdfe84de533f3d875c5687ae5a40f9e6a5d292821b816df1334fb67b2a80e55';
+
+async function getCloudflareJWKs() {
+  const res = await fetch(CF_ACCESS_JWKS_URL);
+  if (!res.ok) throw new Error('Failed to fetch Cloudflare Access JWKs');
+  return await res.json();
+}
+
+app.use('*', async (c, next) => {
+  const jwt = c.req.header('Cf-Access-Jwt-Assertion');
+  if (!jwt) return c.text('Unauthorized', 401);
+  try {
+    const jwks = await getCloudflareJWKs();
+    const { payload } = await jwtVerify(jwt, jwks, { audience: CF_ACCESS_AUD });
+    c.set('cfAccessUser', payload.sub);
+    await next();
+  } catch (e) {
+    return c.text('Unauthorized', 401);
+  }
+});
 
 // =================================================================
 // == MIDDLEWARES & HELPERS                                       ==

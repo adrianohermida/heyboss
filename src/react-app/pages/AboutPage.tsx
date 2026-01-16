@@ -25,7 +25,7 @@ import {
   Youtube,
   ExternalLink
 } from 'lucide-react';
-import { Header } from '../components/Header';
+import Header from '../components/Header';
 
 const AboutHero = () => (
   <section className="relative pt-32 pb-20 lg:pt-48 lg:pb-32 overflow-hidden bg-brand-dark">

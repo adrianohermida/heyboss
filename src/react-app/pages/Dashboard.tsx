@@ -38,7 +38,7 @@ import {
   Chrome
 } from 'lucide-react';
 
-import { Header } from '../components/Header';
+import Header from '../components/Header';
 import { AIMonitoringModule } from '../components/AIMonitoring/AIMonitoringModule';
 import { BalcaoVirtualModule } from '../components/BalcaoVirtual/BalcaoVirtualModule';
 import { ChatbotConfigModule } from '../components/ChatbotConfigModule';
