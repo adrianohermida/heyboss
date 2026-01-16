@@ -97,9 +97,85 @@ const adminPermissionMiddleware = async (c: any, next: any) => {
   return c.json({ error: "Forbidden - Admin access required" }, 403);
 };
 
+
 // =================================================================
 // == AUTHENTICATION ROUTES                                       ==
 // =================================================================
+
+import { nanoid } from 'nanoid';
+
+// Google Calendar OAuth for admin integration
+app.get("/api/admin/google-calendar/connect", authMiddleware, adminPermissionMiddleware, async (c) => {
+  const state = nanoid();
+  await c.env.DB.prepare("INSERT INTO oauth_states (state, created_at) VALUES (?, ?)").bind(state, new Date().toISOString()).run();
+  const redirectUrl = await getOAuthRedirectUrl("google", {
+    scope: [
+      "https://www.googleapis.com/auth/calendar.events",
+      "https://www.googleapis.com/auth/calendar.readonly",
+      "openid",
+      "email",
+      "profile"
+    ],
+    state,
+    prompt: "consent",
+    access_type: "offline",
+    redirect_uri: c.env.GOOGLE_CALENDAR_REDIRECT_URI
+  });
+  return c.redirect(redirectUrl, 302);
+});
+
+app.get("/api/admin/google-calendar/callback", async (c) => {
+  const code = c.req.query("code");
+  const state = c.req.query("state");
+  if (!code || !state) return c.text("Missing code or state", 400);
+  const stateRow = await c.env.DB.prepare("SELECT * FROM oauth_states WHERE state = ?").bind(state).first();
+  if (!stateRow) return c.text("Invalid state", 400);
+  await c.env.DB.prepare("DELETE FROM oauth_states WHERE state = ?").bind(state).run();
+  const tokenRes = await fetch("https://oauth2.googleapis.com/token", {
+    method: "POST",
+    headers: { "Content-Type": "application/x-www-form-urlencoded" },
+    body: new URLSearchParams({
+      code,
+      client_id: c.env.GOOGLE_CLIENT_ID,
+      client_secret: c.env.GOOGLE_CLIENT_SECRET,
+      redirect_uri: c.env.GOOGLE_CALENDAR_REDIRECT_URI,
+      grant_type: "authorization_code"
+    })
+  });
+  const tokenData = await tokenRes.json();
+  if (!tokenData.access_token) return c.text("Failed to get tokens", 400);
+  const userInfoRes = await fetch("https://www.googleapis.com/oauth2/v2/userinfo", {
+    headers: { Authorization: `Bearer ${tokenData.access_token}` }
+  });
+  const userInfo = await userInfoRes.json();
+  if (!userInfo.email) return c.text("Failed to get user email", 400);
+  await c.env.DB.prepare(`INSERT OR REPLACE INTO google_calendar_tokens (user_email, access_token, refresh_token, expires_at, scope, token_type, id_token, created_at)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?)`)
+    .bind(
+      userInfo.email,
+      tokenData.access_token,
+      tokenData.refresh_token,
+      new Date(Date.now() + (tokenData.expires_in || 3600) * 1000).toISOString(),
+      tokenData.scope,
+      tokenData.token_type,
+      tokenData.id_token || null,
+      new Date().toISOString()
+    ).run();
+  return c.redirect("/dashboard?google=success", 302);
+});
+
+app.get("/api/admin/integrations/status", authMiddleware, adminPermissionMiddleware, async (c) => {
+  const user = c.get("user");
+  let googleCalendar = { isConnected: false };
+  if (user && user.email) {
+    const row = await c.env.DB.prepare("SELECT * FROM google_calendar_tokens WHERE user_email = ?").bind(user.email).first();
+    if (row && row.access_token) {
+      googleCalendar = { isConnected: true, email: user.email };
+    }
+  }
+  // ...existing Stripe status logic...
+  return c.json({ googleCalendar });
+});
 
 app.get("/api/oauth/google/redirect_url", async (c) => {
   const origin = c.req.query("originUrl") || "";

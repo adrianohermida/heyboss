@@ -1,3 +1,20 @@
+-- Table to store OAuth state for CSRF protection
+CREATE TABLE IF NOT EXISTS oauth_states (
+  state TEXT PRIMARY KEY,
+  created_at TEXT NOT NULL
+);
+
+-- Table to store Google Calendar OAuth tokens for admin
+CREATE TABLE IF NOT EXISTS google_calendar_tokens (
+  user_email TEXT PRIMARY KEY,
+  access_token TEXT NOT NULL,
+  refresh_token TEXT,
+  expires_at TEXT,
+  scope TEXT,
+  token_type TEXT,
+  id_token TEXT,
+  created_at TEXT NOT NULL
+);
 -- Exemplo de schema SQL para Supabase
 create table clientes (
   id uuid primary key default uuid_generate_v4(),
