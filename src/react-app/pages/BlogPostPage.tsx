@@ -192,7 +192,7 @@ const BlogPostPage = () => {
               <div className="max-w-md mx-auto">
                 <CustomForm 
                   id="newsletter_form"
-                  schema={allConfigs.newsletter_form.jsonSchema}
+                  schema={allConfigs.newsletter_form.jsonSchema as any}
                   onSubmit={handleNewsletterSubmit}
                   labels={{ submit: "Assinar Agora" }}
                   className="text-left"
@@ -242,8 +242,11 @@ const BlogPostPage = () => {
         }
       `}</style>
     </div>
-  
-};
+  );
+}
+
+
+
 
 
 
