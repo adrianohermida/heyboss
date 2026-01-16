@@ -171,6 +171,9 @@ export const CheckoutSuccessPage: React.FC = () => {
       </div>
     </div>
   );
+}
+
+
 
 
 
