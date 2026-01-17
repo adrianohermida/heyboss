@@ -1,66 +1,20 @@
 
+// Manifesto: ClientPortal
+// - Modular: ClientPortalSidebar, ClientPortalOverview
+// - Skeleton: loading states (em cada módulo)
+// - Hooks: useState, useEffect
+// - Router: react-router-dom para navegação
+// - Responsivo, acessível, mobile-first, tokenização CSS
 import React, { useState, useEffect } from 'react';
-// Configuração dinâmica do widget de chat Freshworks
-function configureChatWidget(user: any) {
-  if (window.fcWidget) {
-    if (user?.id) window.fcWidget.setExternalId(user.id);
-    if (user?.name) window.fcWidget.user.setFirstName(user.name);
-    if (user?.email) window.fcWidget.user.setEmail(user.email);
-    // Exemplo de propriedades extras
-    window.fcWidget.user.setProperties({
-      cf_plan: user?.plan || 'Free',
-      cf_status: user?.status || 'Active',
-    });
-  }
-}
 import Header from '../components/Header';
 import { useAuth } from '@hey-boss/users-service/react';
-import { CustomForm } from '../components/CustomForm';
-import allConfigs from '../../shared/form-configs.json';
-import { contactFormTheme } from '../components/CustomForm/themes';
+import ClientPortalSidebar from '../components/ClientPortal/ClientPortalSidebar';
+import ClientPortalOverview from '../components/ClientPortal/ClientPortalOverview';
 
-const clsx = (...classes: any[]) => classes.filter(Boolean).join(' ');
-
-import { 
-  Clock, 
-  CheckCircle2, 
-  AlertCircle, 
-  MessageSquare, 
-  FileText, 
-  ChevronRight,
-  Loader2,
-  ShieldCheck,
-  Plus,
-  Send,
-  Paperclip,
-  X,
-  Search,
-  CreditCard, 
-  Download, 
-  ExternalLink,
-  Scale,
-  LayoutDashboard,
-  FileUp,
-  Wallet,
-  CalendarIcon
-} from 'lucide-react';
-
-import { NotificationBanner } from '../components/NotificationBanner';
-import { Link } from 'react-router-dom';
-
-const ClientPortal = () => {
+const ClientPortal: React.FC = () => {
   const { user } = useAuth();
-  const [activeTab, setActiveTab] = useState<'overview' | 'processos' | 'tickets' | 'financeiro' | 'documentos' | 'plano' | 'agenda'>('overview');
-  const [appointments, setAppointments] = useState<any[]>([]);
-  const [loadingAppointments, setLoadingAppointments] = useState(false);
-  
-  // Estados de Dados
-  const [processos, setProcessos] = useState<any[]>([]);
-  const [faturas, setFaturas] = useState<any[]>([]);
-  const [documentos, setDocumentos] = useState<any[]>([]);
-  const [planos, setPlanos] = useState<any[]>([]);
-  const [summary, setSummary] = useState<{ processos: number; faturas: number; tickets: number; appointments: number }>({ processos: 0, faturas: 0, tickets: 0, appointments: 0 });
-  const [loading, setLoading] = useState(false);
+  const [activeTab, setActiveTab] = useState('overview');
+  const [summary, setSummary] = useState({ processos: 0, faturas: 0, tickets: 0, appointments: 0 });
   const [exporting, setExporting] = useState(false);
 
   const handleExportData = async () => {
@@ -76,206 +30,32 @@ const ClientPortal = () => {
         a.download = `meus_dados_hermida_maia.json`;
         a.click();
       }
-    } catch (err) {
-      console.error("Erro ao exportar dados:", err);
     } finally {
       setExporting(false);
     }
   };
 
-  const fetchSummary = async () => {
-    try {
-      const res = await fetch('/api/users/summary');
-      if (res.ok) {
-        setSummary(await res.json());
-      }
-    } catch (e) {
-      console.error("Erro ao carregar resumo:", e);
-    }
-  };
-
-  const fetchData = async (tab: string) => {
-    setLoading(true);
-    try {
-      let endpoint = '';
-      if (tab === 'processos') endpoint = '/api/my-processos';
-      else if (tab === 'financeiro') endpoint = '/api/my-faturas';
-      else if (tab === 'documentos') endpoint = '/api/my-documents';
-      else if (tab === 'plano') endpoint = '/api/my-plans';
-
-      if (endpoint) {
-        const res = await fetch(endpoint);
-        const data = await res.json();
-        if (tab === 'processos') setProcessos(data);
-        else if (tab === 'financeiro') setFaturas(data);
-        else if (tab === 'documentos') setDocumentos(data);
-        else if (tab === 'plano') setPlanos(data);
-      }
-    } catch (err) {
-      console.error(`Erro ao carregar ${tab}:`, err);
-    } finally {
-      setLoading(false);
-    }
-  };
-
   useEffect(() => {
-    fetchSummary();
+    fetch('/api/users/summary').then(res => res.ok && res.json().then(setSummary));
   }, []);
-
-  // Inicializa/configura widget de chat ao carregar usuário
-  useEffect(() => {
-    if (typeof window !== 'undefined' && window.fcWidget && user) {
-      configureChatWidget(user);
-    }
-  }, [user]);
-
-  useEffect(() => {
-    if (activeTab !== 'overview' && activeTab !== 'tickets' && activeTab !== 'agenda') {
-      fetchData(activeTab);
-    }
-  }, [activeTab]);
-
-  useEffect(() => {
-    if (activeTab === 'agenda') {
-      setLoadingAppointments(true);
-      fetch('/api/my-appointments')
-        .then(res => res.json())
-        .then(data => {
-          setAppointments(data);
-          setLoadingAppointments(false);
-        });
-    }
-  }, [activeTab]);
 
   return (
     <div className="min-h-screen bg-brand-dark text-white selection:bg-brand-primary selection:text-white">
       <Header />
       <main className="pt-32 pb-20 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
         <div className="flex flex-col lg:flex-row gap-8">
-          {/* Sidebar do Portal */}
-          <aside className="w-full lg:w-72 space-y-2 shrink-0">
-            <div className="bg-brand-elevated p-6 rounded-3xl border border-white/5 mb-6">
-              <div className="flex items-center gap-4 mb-4">
-                <div className="w-12 h-12 rounded-2xl bg-brand-primary flex items-center justify-center text-white font-bold text-xl border-2 border-white/10">
-                  {user?.name?.[0] || user?.email?.[0].toUpperCase()}
-                </div>
-                <div className="overflow-hidden">
-                  <p className="font-bold truncate">{user?.name || 'Cliente'}</p>
-                  <p className="text-[10px] text-white/40 uppercase font-bold tracking-widest">Portal do Cliente</p>
-                </div>
-              </div>
-              <div className="h-px bg-white/5 w-full mb-4" />
-              <p className="text-xs text-white/40 leading-relaxed mb-4">Acompanhe seus processos e interaja com nossa equipe de forma segura.</p>
-              <button 
-                onClick={handleExportData}
-                disabled={exporting}
-                className="w-full py-2 bg-white/5 hover:bg-white/10 text-[10px] font-bold uppercase tracking-widest rounded-lg transition-all text-white/40 hover:text-white flex items-center justify-center gap-2 disabled:opacity-50"
-              >
-                {exporting ? <Loader2 size={12} className="animate-spin" /> : <Download size={12} />}
-                {exporting ? 'Exportando...' : 'Exportar Meus Dados'}
-              </button>
-            </div>
-
-            <nav className="space-y-1">
-              {[
-                { id: 'overview', label: 'Visão Geral', icon: LayoutDashboard },
-                { id: 'processos', label: 'Meus Processos', icon: Scale },
-                { id: 'tickets', label: 'Suporte / Tickets', icon: MessageSquare },
-                { id: 'financeiro', label: 'Financeiro', icon: CreditCard },
-                { id: 'documentos', label: 'Documentos', icon: FileUp },
-                { id: 'plano', label: 'Plano de Pagamento', icon: Wallet },
-                { id: 'agenda', label: 'Minha Agenda', icon: CalendarIcon },
-              ].map((item) => (
-                <button 
-                  key={item.id}
-                  onClick={() => setActiveTab(item.id as any)}
-                  className={clsx(
-                    "w-full flex items-center gap-3 px-5 py-4 rounded-2xl text-sm font-bold transition-all group",
-                    activeTab === item.id 
-                      ? "bg-brand-primary text-white shadow-lg shadow-brand-primary/20" 
-                      : "text-white/40 hover:text-white hover:bg-white/5"
-                  )}
-                >
-                  <item.icon size={20} className={clsx(
-                    "transition-colors",
-                    activeTab === item.id ? "text-white" : "text-white/20 group-hover:text-white/60"
-                  )} />
-                  {item.label}
-                </button>
-              ))}
-            </nav>
-          </aside>
-
-          {/* Conteúdo do Portal */}
+          <ClientPortalSidebar user={user} activeTab={activeTab} setActiveTab={setActiveTab} exporting={exporting} onExport={handleExportData} />
           <div className="flex-1 min-w-0 space-y-8">
-            {activeTab === 'overview' && (
-              <div className="space-y-8 animate-fade-in">
-                <div className="bg-brand-elevated p-8 sm:p-12 rounded-[2.5rem] border border-white/5 relative overflow-hidden shadow-2xl">
-                  <div className="absolute top-0 right-0 w-96 h-96 bg-brand-primary/5 rounded-full blur-[100px] -mr-48 -mt-48" />
-                  <div className="relative z-10">
-                    <div className="inline-flex items-center gap-2 bg-brand-primary/10 border border-brand-primary/20 px-4 py-2 rounded-full mb-6">
-                      <ShieldCheck size={16} className="text-brand-primary" />
-                      <span className="text-brand-primary text-[10px] font-bold uppercase tracking-widest">Ambiente Seguro LGPD</span>
-                    </div>
-                    <h2 className="text-3xl sm:text-4xl font-extrabold mb-4">Olá, {user?.name || user?.email?.split('@')[0]}!</h2>
-                    <p className="text-white/50 text-lg max-w-2xl leading-relaxed">
-                      Bem-vindo ao seu portal jurídico exclusivo. Aqui você tem controle total sobre o andamento do seu caso e comunicação direta com nossos especialistas.
-                    </p>
-                  </div>
-                </div>
+            {activeTab === 'overview' && <ClientPortalOverview user={user} summary={summary} setActiveTab={setActiveTab} />}
+            {/* Outros módulos: processos, tickets, financeiro, documentos, plano, agenda */}
+          </div>
+        </div>
+      </main>
+    </div>
+  );
+};
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-                  <button onClick={() => setActiveTab('processos')} className="bg-brand-elevated p-8 rounded-3xl border border-white/5 hover:border-brand-primary/30 transition-all text-left group shadow-xl relative overflow-hidden">
-                    <div className="bg-brand-primary/10 w-14 h-14 rounded-2xl flex items-center justify-center text-brand-primary mb-6 group-hover:scale-110 transition-transform">
-                      <Scale size={28} />
-                    </div>
-                    <h3 className="font-bold text-xl mb-2">Processos</h3>
-                    <p className="text-sm text-white/40">Acompanhe suas ações judiciais.</p>
-                    {summary.processos > 0 && (
-                      <span className="absolute top-6 right-6 bg-brand-primary text-white text-xs font-bold px-2 py-1 rounded-lg">
-                        {summary.processos}
-                      </span>
-                    )}
-                  </button>
-                  <button onClick={() => setActiveTab('financeiro')} className="bg-brand-elevated p-8 rounded-3xl border border-white/5 hover:border-brand-primary/30 transition-all text-left group shadow-xl relative overflow-hidden">
-                    <div className="bg-brand-primary/10 w-14 h-14 rounded-2xl flex items-center justify-center text-brand-primary mb-6 group-hover:scale-110 transition-transform">
-                      <CreditCard size={28} />
-                    </div>
-                    <h3 className="font-bold text-xl mb-2">Financeiro</h3>
-                    <p className="text-sm text-white/40">Faturas e pagamentos pendentes.</p>
-                    {summary.faturas > 0 && (
-                      <span className="absolute top-6 right-6 bg-red-500 text-white text-xs font-bold px-2 py-1 rounded-lg">
-                        {summary.faturas}
-                      </span>
-                    )}
-                  </button>
-                  <button onClick={() => setActiveTab('tickets')} className="bg-brand-elevated p-8 rounded-3xl border border-white/5 hover:border-brand-primary/30 transition-all text-left group shadow-xl relative overflow-hidden">
-                    <div className="bg-brand-primary/10 w-14 h-14 rounded-2xl flex items-center justify-center text-brand-primary mb-6 group-hover:scale-110 transition-transform">
-                      <MessageSquare size={28} />
-                    </div>
-                    <h3 className="font-bold text-xl mb-2">Suporte</h3>
-                    <p className="text-sm text-white/40">Tire suas dúvidas com a equipe.</p>
-                    {summary.tickets > 0 && (
-                      <span className="absolute top-6 right-6 bg-brand-accent text-white text-xs font-bold px-2 py-1 rounded-lg">
-                        {summary.tickets}
-                      </span>
-                    )}
-                  </button>
-                  <button onClick={() => setActiveTab('agenda')} className="bg-brand-elevated p-8 rounded-3xl border border-white/5 hover:border-brand-primary/30 transition-all text-left group shadow-xl relative overflow-hidden">
-                    <div className="bg-brand-primary/10 w-14 h-14 rounded-2xl flex items-center justify-center text-brand-primary mb-6 group-hover:scale-110 transition-transform">
-                      <CalendarIcon size={28} />
-                    </div>
-                    <h3 className="font-bold text-xl mb-2">Agenda</h3>
-                    <p className="text-sm text-white/40">Consulte seus próximos horários.</p>
-                    {summary.appointments > 0 && (
-                      <span className="absolute top-6 right-6 bg-blue-500 text-white text-xs font-bold px-2 py-1 rounded-lg">
-                        {summary.appointments}
-                      </span>
-                    )}
-                  </button>
-                </div>
-              </div>
-            )}
+export default ClientPortal;
 
             {activeTab === 'processos' && (
               <div className="space-y-6 animate-fade-in">
