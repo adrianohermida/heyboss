@@ -17,6 +17,11 @@ import CRMModule from '../components/Dashboard/CRMModule';
 import ProcessosModule from '../components/Dashboard/ProcessosModule';
 import FaturasModule from '../components/Dashboard/FaturasModule';
 import TicketsModule from '../components/Dashboard/TicketsModule';
+import AIMonitoringModule from '../components/AIMonitoring/AIMonitoringModule';
+import { BalcaoVirtualModule } from '../components/BalcaoVirtual/BalcaoVirtualModule';
+import { ChatbotConfigModule } from '../components/ChatbotConfigModule';
+import { BlogManagementModule } from '../components/BlogManagement/BlogManagementModule';
+import { PublicacoesModule } from '../components/Publicacoes/PublicacoesModule';
 import clsx from 'clsx';
 import { CreditCard, Download, Search, MessageSquare, ChevronRight, Bot, Zap, CheckCircle2, Clock, AlertCircle, Calendar, Settings, Chrome, Loader2 } from 'lucide-react';
 // Add missing tab modules used by the dashboard
@@ -60,8 +65,13 @@ const Dashboard: React.FC = () => {
                 {activeTab === 'blog' && <BlogManagementModule />}
                 {activeTab === 'agenda' && <AdminAgendaModule />}
                 {activeTab === 'overview' && <OverviewModule />}
+                {activeTab === 'publicacoes' && <PublicacoesModule />}
+                {activeTab === 'ai' && <AIMonitoringModule />}
+                {activeTab === 'balcao' && <BalcaoVirtualModule />}
+                {activeTab === 'chatbot' && <ChatbotConfigModule />}
+                {activeTab === 'blog' && <BlogManagementModule />}
+                {activeTab === 'agenda' && <AdminAgendaModule />}
                 {activeTab === 'config' && <ConfigModule />}
-                {/* Adicione outros módulos conforme modularização */}
               </div>
             )}
           </div>
@@ -71,9 +81,7 @@ const Dashboard: React.FC = () => {
   );
 };
 
-// Removed misplaced dummy block and function to restore parser correctness
-
-const IAModule = ({ data }: { data: any[] }) => (
+const AIModule = ({ data }: { data: any[] }) => (
   <div className="grid gap-4">
     {data.map((session, i) => (
       <div key={i} className="bg-brand-elevated p-6 rounded-2xl border border-white/5 shadow-xl">
