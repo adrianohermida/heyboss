@@ -1,6 +1,14 @@
+import React from 'react';
 import AboutPage from './AboutPage';
+import Footer from '../components/Footer';
+import ScrollToTopButton from '../components/ScrollToTopButton';
 
-// Wrapper para AboutPage2 para roteamento alternativo
 export default function AboutPage2() {
-  return <AboutPage />;
+  return (
+    <>
+      <AboutPage />
+      <Footer />
+      <ScrollToTopButton />
+    </>
+  );
 }
