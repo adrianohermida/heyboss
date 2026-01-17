@@ -31,6 +31,7 @@ import {
   AlertCircle
 } from 'lucide-react';
 import Header from '../components/Header';
+import ScrollToTopButton from '../components/ScrollToTopButton';
 import { CustomForm } from '../components/CustomForm';
 import { newsletterTheme } from '../components/CustomForm/themes';
 import allConfigs from '../../shared/form-configs.json';
@@ -841,21 +842,24 @@ const Footer = () => {
 
 export const HomePage = () => {
   return (
-    <div className="min-h-screen bg-brand-dark selection:bg-brand-primary selection:text-white">
-      <Header />
-      <main>
-        <Hero />
-        <Stats />
-        <Calculator />
-        <HowItWorks />
-        <VideoJourney />
-        <Testimonials />
-        <Services />
-        <Blog />
-        <FinalCTA />
-      </main>
-      <Footer />
-    </div>
+    <>
+      <div className="min-h-screen bg-brand-dark selection:bg-brand-primary selection:text-white">
+        <Header />
+        <main>
+          <Hero />
+          <Stats />
+          <Calculator />
+          <HowItWorks />
+          <VideoJourney />
+          <Testimonials />
+          <Services />
+          <Blog />
+          <FinalCTA />
+        </main>
+        <Footer />
+      </div>
+      <ScrollToTopButton />
+    </>
   );
 };
 
