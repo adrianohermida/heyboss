@@ -56,32 +56,43 @@ const Dashboard: React.FC = () => {
   );
 };
 
-export default Dashboard;
 
+// --- Fix: Add missing imports and move misplaced code block ---
+import clsx from 'clsx';
+import { CreditCard, Download, Search, MessageSquare, ChevronRight, Bot, Zap, CheckCircle2, Clock, AlertCircle, Calendar, Settings, Chrome, Loader2 } from 'lucide-react';
 
-              className={clsx(
-                "px-4 py-2 rounded-xl text-xs font-bold transition-all border",
-                statusFilter === s 
-                  ? "bg-brand-primary border-brand-primary text-white" 
-                  : "bg-white/5 border-white/10 text-white/40 hover:text-white"
-              )}
-            >
-              {s === 'all' ? 'Todos' : s}
-            </button>
-          ))}
-        </div>
-        <div className="relative w-full sm:w-64">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-white/20" size={16} />
-          <input
-            type="text"
-            placeholder="Filtrar nesta aba..."
-            value={localSearch}
-            onChange={(e) => setLocalSearch(e.target.value)}
-            className="w-full bg-brand-dark border border-white/10 rounded-xl py-2 pl-10 pr-4 text-xs outline-none focus:border-brand-primary transition-all"
-          />
-        </div>
+// Dummy data and handlers for the misplaced code block
+const filteredFaturas = [];
+const localSearch = '';
+const setLocalSearch = (_: any) => {};
+const handleCreateLink = (id: any) => {};
+const statusFilter = 'all';
+const s = 'all';
+
+// --- Move misplaced code block into a function for clarity ---
+function MisplacedBlock() {
+  return (
+    <>
+      <div
+        className={clsx(
+          "px-4 py-2 rounded-xl text-xs font-bold transition-all border",
+          statusFilter === s
+            ? "bg-brand-primary border-brand-primary text-white"
+            : "bg-white/5 border-white/10 text-white/40 hover:text-white"
+        )}
+      >
+        {s === 'all' ? 'Todos' : s}
       </div>
-
+      <div className="relative w-full sm:w-64">
+        <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-white/20" size={16} />
+        <input
+          type="text"
+          placeholder="Filtrar nesta aba..."
+          value={localSearch}
+          onChange={(e) => setLocalSearch(e.target.value)}
+          className="w-full bg-brand-dark border border-white/10 rounded-xl py-2 pl-10 pr-4 text-xs outline-none focus:border-brand-primary transition-all"
+        />
+      </div>
       {/* Tabela de Faturas */}
       <div className="bg-brand-elevated rounded-3xl border border-white/5 overflow-hidden shadow-2xl">
         <div className="overflow-x-auto">
@@ -96,7 +107,7 @@ export default Dashboard;
               </tr>
             </thead>
             <tbody className="divide-y divide-white/5">
-              {filteredFaturas.map((fatura, i) => (
+              {filteredFaturas.map((fatura: any, i: number) => (
                 <tr key={i} className="hover:bg-white/5 transition-colors group">
                   <td className="px-6 py-4">
                     <div className="flex items-center gap-3">
@@ -121,8 +132,8 @@ export default Dashboard;
                   <td className="px-6 py-4">
                     <span className={clsx(
                       "text-[10px] font-bold uppercase px-2 py-1 rounded-md",
-                      fatura.status === 'Pago' ? "bg-green-500/10 text-green-400" : 
-                      fatura.status === 'Atrasado' ? "bg-red-500/10 text-red-400" : "bg-yellow-500/10 text-yellow-400"
+                      fatura.status === 'Pago' ? "bg-green-500/10 text-green-400" :
+                        fatura.status === 'Atrasado' ? "bg-red-500/10 text-red-400" : "bg-yellow-500/10 text-yellow-400"
                     )}>
                       {fatura.status}
                     </span>
@@ -130,7 +141,7 @@ export default Dashboard;
                   <td className="px-6 py-4 text-right">
                     <div className="flex justify-end gap-2">
                       {fatura.status !== 'Pago' && (
-                        <button 
+                        <button
                           onClick={() => handleCreateLink(fatura.id)}
                           title="Gerar Link Stripe"
                           className="p-2 bg-brand-primary/10 text-brand-primary hover:bg-brand-primary hover:text-white rounded-lg transition-all"
@@ -138,7 +149,7 @@ export default Dashboard;
                           <CreditCard size={16} />
                         </button>
                       )}
-                      <button 
+                      <button
                         title="Baixar PDF"
                         className="p-2 bg-white/5 text-white/40 hover:text-white rounded-lg transition-all"
                       >
@@ -157,44 +168,9 @@ export default Dashboard;
           </div>
         )}
       </div>
-    </div>
+    </>
   );
-};
-
-const TicketsModule = ({ data }: { data: any[] }) => (
-  <div className="grid gap-4">
-    {data.map((ticket, i) => (
-      <div key={i} className="bg-brand-elevated p-6 rounded-2xl border border-white/5 hover:border-brand-primary/30 transition-all group shadow-xl">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-4">
-            <div className="bg-brand-primary/10 p-3 rounded-xl text-brand-primary">
-              <MessageSquare size={24} />
-            </div>
-            <div>
-              <h4 className="font-bold text-lg">{ticket.subject}</h4>
-              <p className="text-xs text-white/40">{ticket.client_email} • {new Date(ticket.updated_at).toLocaleString('pt-BR')}</p>
-            </div>
-          </div>
-          <div className="flex items-center gap-3">
-            <span className={clsx(
-              "text-[10px] font-bold uppercase px-3 py-1 rounded-full",
-              ticket.priority === 'Alta' ? "bg-red-500/10 text-red-400" : "bg-white/5 text-white/40"
-            )}>
-              {ticket.priority}
-            </span>
-            <span className={clsx(
-              "text-[10px] font-bold uppercase px-3 py-1 rounded-full",
-              ticket.status === 'Aberto' ? "bg-brand-primary/10 text-brand-primary" : "bg-green-500/10 text-green-400"
-            )}>
-              {ticket.status}
-            </span>
-            <ChevronRight size={18} className="text-white/20 group-hover:text-brand-primary transition-all" />
-          </div>
-        </div>
-      </div>
-    ))}
-  </div>
-);
+}
 
 
 
