@@ -1,33 +1,33 @@
 name: Deploy Backend to Cloudflare Workers
 
 on: 
-  push:
+  push: 
     branches: 
       - main
       - master
   pull_request:
-    branches:
+    branches: 
       - main
       - master
 
 jobs:
   build-and-deploy:
-    runs-on: ubuntu-latest
-    environment: CLOUDFLARE   # <- GitHub Environment (onde estão os secrets)
+    runs-on:  ubuntu-latest
+    # REMOVIDO: environment: CLOUDFLARE
     steps:
-      - uses: actions/checkout@v4
+      - uses:  actions/checkout@v4
 
       - uses: actions/setup-node@v4
-        with:
+        with: 
           node-version: '24'
           cache: 'npm'
 
       - name: Install dependencies
         run: npm ci
 
-      - name:  Deploy to Cloudflare Workers
-        if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master'
-        env: 
-          CLOUDFLARE_API_TOKEN: ${{ secrets. CLOUDFLARE_API_TOKEN }}
-          CLOUDFLARE_ACCOUNT_ID: ${{ secrets. CLOUDFLARE_ACCOUNT_ID }}
+      - name: Deploy to Cloudflare Workers
+        if: github. ref == 'refs/heads/main' || github.ref == 'refs/heads/master'
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
         run: npx wrangler deploy --env production --verbose
