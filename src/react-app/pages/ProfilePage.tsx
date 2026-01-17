@@ -7,14 +7,15 @@
  */
 
 
+
 import React, { useState, useEffect } from 'react';
 import Header from '../components/Header';
-import { CustomForm } from '../components/CustomForm';
-import { contactFormTheme } from '../components/CustomForm/themes';
-import allConfigs from '../../shared/form-configs.json';
-import { User, Shield, Phone, Briefcase, Loader2, CheckCircle2 } from 'lucide-react';
 import { useAuth } from '../auth/supabaseAuth';
-
+import ProfileHeader from '../components/Profile/ProfileHeader';
+import ProfileAccessCard from '../components/Profile/ProfileAccessCard';
+import ProfileForm from '../components/Profile/ProfileForm';
+import ProfileSkeleton from '../components/Profile/ProfileSkeleton';
+import { profilePageManifest } from '../components/Profile/ProfilePage.manifest';
 
 const adminEmails = ["adrianohermida@gmail.com", "contato@hermidamaia.adv.br", "admin@example.com"];
 
@@ -25,7 +26,6 @@ const ProfilePage = () => {
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState<{ type: 'success' | 'error', text: string } | null>(null);
 
-  // Detecta tipo de usuário
   const email = (supaUser?.email || '').toLowerCase();
   const isAdmin = adminEmails.includes(email);
   const isColaborador = !isAdmin && email.endsWith('@hermidamaia.adv.br');
@@ -62,13 +62,7 @@ const ProfilePage = () => {
     }
   };
 
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-brand-dark flex items-center justify-center">
-        <Loader2 className="text-brand-primary animate-spin" size={48} />
-      </div>
-    );
-  }
+  if (loading) return <ProfileSkeleton />;
 
   return (
     <div className="min-h-screen bg-brand-dark text-white">
@@ -82,73 +76,13 @@ const ProfilePage = () => {
             {isCliente && 'Cliente'}
           </p>
         </div>
-
         <div className="grid md:grid-cols-3 gap-8">
           <div className="md:col-span-1 space-y-6">
-            <div className="bg-brand-elevated p-8 rounded-3xl border border-white/5 text-center">
-              <div className="w-24 h-24 bg-brand-primary/20 rounded-full flex items-center justify-center mx-auto mb-4">
-                <User className="text-brand-primary" size={48} />
-              </div>
-              <h2 className="font-bold text-lg">{profile?.user_email || email}</h2>
-              <p className="text-white/40 text-xs uppercase tracking-widest mt-1">
-                {isAdmin && 'Administrador'}
-                {isColaborador && 'Colaborador'}
-                {isCliente && 'Cliente'}
-              </p>
-            </div>
-
-            <div className="bg-brand-elevated p-6 rounded-2xl border border-white/5 space-y-4">
-              <div className="flex items-center gap-3 text-sm">
-                <Shield className="text-brand-primary" size={18} />
-                <span className="text-white/60">Acesso Verificado</span>
-              </div>
-              {isAdmin || isColaborador ? (
-                <div className="flex items-center gap-3 text-sm">
-                  <Briefcase className="text-brand-primary" size={18} />
-                  <span className="text-white/60">{profile?.area_atuacao || 'Área não definida'}</span>
-                </div>
-              ) : null}
-            </div>
+            <ProfileHeader email={email} profile={profile} isAdmin={isAdmin} isColaborador={isColaborador} isCliente={isCliente} />
+            <ProfileAccessCard profile={profile} isAdmin={isAdmin} isColaborador={isColaborador} />
           </div>
-
           <div className="md:col-span-2">
-            <div className="bg-brand-elevated p-8 rounded-3xl border border-white/5 shadow-xl">
-              {message && (
-                <div className={`mb-8 p-4 rounded-xl flex items-center gap-3 ${message.type === 'success' ? 'bg-brand-primary/10 text-brand-primary border border-brand-primary/20' : 'bg-red-500/10 text-red-400 border border-red-500/20'}`}>
-                  {message.type === 'success' ? <CheckCircle2 size={20} /> : <Shield size={20} />}
-                  <span className="text-sm font-bold">{message.text}</span>
-                </div>
-              )}
-
-              {/* LGPD Notice */}
-              <div className="mb-6 p-4 rounded-xl bg-brand-primary/10 border border-brand-primary/20 text-xs text-brand-primary">
-                <b>LGPD:</b> Seus dados pessoais são utilizados apenas para identificação e contato. Você pode editar ou remover seus dados, exceto o e-mail, que é usado como identificador único.
-              </div>
-
-              <CustomForm
-                id="profile_form"
-                schema={{
-                  ...allConfigs.profile_form.jsonSchema,
-                  properties: {
-                    ...allConfigs.profile_form.jsonSchema.properties,
-                    user_email: {
-                      ...allConfigs.profile_form.jsonSchema.properties.user_email,
-                      readOnly: true,
-                      description: 'E-mail não pode ser alterado.'
-                    },
-                    ...(isCliente ? {
-                      oab_numero: { ...allConfigs.profile_form.jsonSchema.properties.oab_numero, hidden: true },
-                      area_atuacao: { ...allConfigs.profile_form.jsonSchema.properties.area_atuacao, hidden: true }
-                    } : {})
-                  },
-                  required: ["user_email"]
-                }}
-                formData={{ ...profile, user_email: email }}
-                onSubmit={handleSave}
-                theme={contactFormTheme}
-                labels={{ submit: saving ? 'Salvando...' : 'Salvar Alterações' }}
-              />
-            </div>
+            <ProfileForm profile={profile} email={email} isCliente={isCliente} saving={saving} handleSave={handleSave} message={message} />
           </div>
         </div>
       </main>
