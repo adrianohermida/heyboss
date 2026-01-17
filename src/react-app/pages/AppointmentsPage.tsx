@@ -209,20 +209,26 @@ const AppointmentsPage = () => {
 
           <div className="bg-brand-elevated p-8 sm:p-10 rounded-[2.5rem] border border-white/10 shadow-2xl relative">
             {!user && !authLoading && (
-              <div className="absolute inset-0 z-50 bg-brand-dark/60 backdrop-blur-md rounded-[2.5rem] flex flex-col items-center justify-center p-8 text-center">
+              <div className="absolute inset-0 z-50 bg-brand-dark/90 backdrop-blur-md rounded-[2.5rem] flex flex-col items-center justify-center p-8 text-center border-2 border-brand-primary shadow-2xl animate-fade-in">
                 <div className="bg-brand-primary/20 p-4 rounded-full mb-6">
                   <Lock className="text-brand-primary" size={40} />
                 </div>
-                <h2 className="text-2xl font-bold mb-4">Acesso Restrito</h2>
-                <p className="text-white/60 mb-8 max-w-xs">
-                  Para garantir a segurança e o sigilo do seu atendimento, é necessário criar uma conta gratuita antes de agendar.
+                <h2 className="text-2xl font-extrabold text-white mb-2">Acesso Restrito</h2>
+                <p className="text-white/70 mb-8 max-w-xs text-base">
+                  Para agendar, crie uma conta gratuita ou faça login. Seus dados estarão protegidos e o atendimento é sigiloso.
                 </p>
-                <Link to="/register" className="bg-brand-primary text-white px-10 py-4 rounded-xl font-bold text-lg hover:scale-105 transition-all shadow-xl shadow-brand-primary/20">
-                  Criar Conta Gratuita
-                </Link>
-                <p className="text-white/40 text-xs mt-4">
-                  Já tem conta? <Link to="/login" className="text-brand-primary font-bold underline">Entrar</Link>
-                </p>
+                <div className="flex flex-col gap-3 w-full max-w-xs">
+                  <Link to="/register" className="w-full bg-brand-primary hover:bg-brand-primary/90 text-white px-8 py-4 rounded-xl font-bold text-lg transition-all shadow-xl shadow-brand-primary/20 focus:outline-none focus:ring-2 focus:ring-brand-primary focus:ring-offset-2">
+                    Criar Conta Gratuita
+                  </Link>
+                  <Link to="/login" className="w-full bg-white/5 hover:bg-white/10 text-brand-primary border border-brand-primary px-8 py-4 rounded-xl font-bold text-lg transition-all focus:outline-none focus:ring-2 focus:ring-brand-primary focus:ring-offset-2">
+                    Já tenho conta – Entrar
+                  </Link>
+                  <Link to="/forgot-password" className="w-full text-xs text-white/50 hover:text-brand-primary underline mt-2 transition-all">
+                    Esqueci minha senha
+                  </Link>
+                </div>
+                <p className="text-white/30 text-xs mt-6">Ao criar uma conta, você concorda com nossos Termos de Uso e Política de Privacidade.</p>
               </div>
             )}
 
