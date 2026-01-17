@@ -1,9 +1,3 @@
-// Forward declarations to fix hoisting issues for JSX usage
-const FaturasModule: React.FC<{ data: any[] }> = () => null;
-const TicketsModule: React.FC<{ data: any[] }> = () => null;
-const IAModule: React.FC<{ data: any[] }> = () => null;
-const AdminAgendaModule: React.FC = () => null;
-const ConfigModule: React.FC<{ status: any; onUpdate: (configType: string, value: any) => Promise<void>; }> = () => null;
 /**
  * @description Painel Administrativo completo para Hermida Maia Advocacia.
  *             Gerencia Leads, Processos, Faturas, Tickets, Publicações e IA.
@@ -383,6 +377,7 @@ const ProcessosModule = ({ data }: { data: any[] }) => {
     ))}
   </div>
 );
+};
 
 const FaturasModule = ({ data }: { data: any[] }) => {
   const [statusFilter, setStatusFilter] = useState('all');
@@ -731,7 +726,7 @@ const AdminAgendaModule = () => {
   );
 };
 
-const ConfigModule = () => {
+const ConfigModule: React.FC<{ status: any; onUpdate: (configType: string, value: any) => Promise<void>; }> = ({ status: statusProp, onUpdate }) => {
   const [testResult, setTestResult] = React.useState<any>(null);
   const [isTesting, setIsTesting] = React.useState(false);
   const [stripeKey, setStripeKey] = React.useState('');
@@ -809,7 +804,7 @@ const ConfigModule = () => {
     }
   };
 
-  const status = null;
+  const status = statusProp || null;
 
   return (
     <div className="space-y-8 animate-fade-in">
