@@ -17,6 +17,8 @@ import CRMModule from '../components/Dashboard/CRMModule';
 import ProcessosModule from '../components/Dashboard/ProcessosModule';
 import FaturasModule from '../components/Dashboard/FaturasModule';
 import TicketsModule from '../components/Dashboard/TicketsModule';
+import clsx from 'clsx';
+import { CreditCard, Download, Search, MessageSquare, ChevronRight, Bot, Zap, CheckCircle2, Clock, AlertCircle, Calendar, Settings, Chrome, Loader2 } from 'lucide-react';
 
 const Dashboard: React.FC = () => {
   // ...hooks e lógica modular aqui...
@@ -55,11 +57,6 @@ const Dashboard: React.FC = () => {
     </div>
   );
 };
-
-
-// --- Fix: Add missing imports and move misplaced code block ---
-import clsx from 'clsx';
-import { CreditCard, Download, Search, MessageSquare, ChevronRight, Bot, Zap, CheckCircle2, Clock, AlertCircle, Calendar, Settings, Chrome, Loader2 } from 'lucide-react';
 
 // Dummy data and handlers for the misplaced code block
 const filteredFaturas = [];

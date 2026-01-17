@@ -71,6 +71,7 @@ const Header = () => {
   const headerBg = mode === 'clear' ? 'bg-white border-b border-gray-200' : 'bg-brand-dark border-b border-white/10';
   const textMain = mode === 'clear' ? 'text-gray-900' : 'text-white';
   const textSub = mode === 'clear' ? 'text-brand-primary' : 'text-brand-primary';
+
   return (
     <header className={`fixed top-0 w-full z-50 ${headerBg}`} style={{boxShadow: mode === 'clear' ? '0 1px 0 0 #e5e7eb' : undefined}}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">

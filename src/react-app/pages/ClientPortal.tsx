@@ -48,14 +48,6 @@ const ClientPortal: React.FC = () => {
           <div className="flex-1 min-w-0 space-y-8">
             {activeTab === 'overview' && <ClientPortalOverview user={user} summary={summary} setActiveTab={setActiveTab} />}
             {/* Outros módulos: processos, tickets, financeiro, documentos, plano, agenda */}
-          </div>
-        </div>
-      </main>
-    </div>
-  );
-};
-
-export default ClientPortal;
 
             {activeTab === 'processos' && (
               <div className="space-y-6 animate-fade-in">
@@ -708,4 +700,4 @@ const TicketsModule = () => {
   );
 };
 
-
+export default ClientPortal;
