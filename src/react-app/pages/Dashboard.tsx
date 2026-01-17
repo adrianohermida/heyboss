@@ -1,9 +1,4 @@
-// Forward declarations to fix hoisting issues for JSX usage
-const FaturasModule: React.FC<{ data: any[] }> = () => null;
-const TicketsModule: React.FC<{ data: any[] }> = () => null;
-const IAModule: React.FC<{ data: any[] }> = () => null;
-const AdminAgendaModule: React.FC = () => null;
-const ConfigModule: React.FC<{ status: any; onUpdate: (configType: string, value: any) => Promise<void>; }> = () => null;
+// Forward declarations removed - components defined below use function declarations which are hoisted
 /**
  * @description Painel Administrativo completo para Hermida Maia Advocacia.
  *             Gerencia Leads, Processos, Faturas, Tickets, Publicações e IA.
@@ -253,7 +248,8 @@ const Dashboard = () => {
   );
 };
 
-const OverviewModule = () => (
+function OverviewModule() {
+  return (
   <div className="space-y-8">
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
       {[
@@ -296,9 +292,11 @@ const OverviewModule = () => (
       </div>
     </div>
   </div>
-);
+  );
+}
 
-const CRMModule = ({ data }: { data: any[] }) => (
+function CRMModule({ data }: { data: any[] }) {
+  return (
   <div className="bg-brand-elevated rounded-3xl border border-white/5 overflow-hidden shadow-2xl">
     <table className="w-full text-left border-collapse">
       <thead>
@@ -345,9 +343,10 @@ const CRMModule = ({ data }: { data: any[] }) => (
       </tbody>
     </table>
   </div>
-);
+  );
+}
 
-const ProcessosModule = ({ data }: { data: any[] }) => {
+function ProcessosModule({ data }: { data: any[] }) {
   const navigate = useNavigate();
   return (
   <div className="grid gap-4">
@@ -383,8 +382,9 @@ const ProcessosModule = ({ data }: { data: any[] }) => {
     ))}
   </div>
 );
+};
 
-const FaturasModule = ({ data }: { data: any[] }) => {
+function FaturasModule({ data }: { data: any[] }) {
   const [statusFilter, setStatusFilter] = useState('all');
   const [localSearch, setLocalSearch] = useState('');
 
@@ -546,7 +546,8 @@ const FaturasModule = ({ data }: { data: any[] }) => {
   );
 };
 
-const TicketsModule = ({ data }: { data: any[] }) => (
+function TicketsModule({ data }: { data: any[] }) {
+  return (
   <div className="grid gap-4">
     {data.map((ticket, i) => (
       <div key={i} className="bg-brand-elevated p-6 rounded-2xl border border-white/5 hover:border-brand-primary/30 transition-all group shadow-xl">
@@ -579,11 +580,13 @@ const TicketsModule = ({ data }: { data: any[] }) => (
       </div>
     ))}
   </div>
-);
+  );
+}
 
 
 
-const IAModule = ({ data }: { data: any[] }) => (
+function IAModule({ data }: { data: any[] }) {
+  return (
   <div className="grid gap-4">
     {data.map((session, i) => (
       <div key={i} className="bg-brand-elevated p-6 rounded-2xl border border-white/5 shadow-xl">
@@ -614,9 +617,10 @@ const IAModule = ({ data }: { data: any[] }) => (
       </div>
     ))}
   </div>
-);
+  );
+}
 
-const AdminAgendaModule = () => {
+function AdminAgendaModule() {
   const [appointments, setAppointments] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -731,7 +735,7 @@ const AdminAgendaModule = () => {
   );
 };
 
-const ConfigModule = () => {
+function ConfigModule() {
   const [testResult, setTestResult] = React.useState<any>(null);
   const [isTesting, setIsTesting] = React.useState(false);
   const [stripeKey, setStripeKey] = React.useState('');
