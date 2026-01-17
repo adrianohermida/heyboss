@@ -65,13 +65,13 @@ const Hero = () => {
             <button 
               onClick={() => document.getElementById('calculadora')?.scrollIntoView({ behavior: 'smooth' })}
               className={`w-full sm:w-auto font-bold text-lg flex items-center justify-center gap-3 transition-all rounded-xl px-8 py-4 group
-                ${mode === 'clear' ? 'bg-brand-primary text-white hover:bg-brand-primary/90 shadow-md border border-brand-primary/80' : 'bg-brand-primary hover:bg-brand-primary/90 text-white shadow-xl shadow-brand-primary/20 border-none'}`}
+                ${mode === 'clear' ? 'bg-[#00d969] text-[#3a4b67] hover:bg-[#00c75a] shadow-md border border-[#00d969]' : 'bg-[#00d969] text-[#3a4b67] hover:bg-[#00c75a] shadow-xl border border-[#00d969]'}`}
             >
               Calcular Gratuitamente
               <ArrowRight size={20} className="group-hover:translate-x-1 transition-transform" />
             </button>
             <Link to="/appointments" className={`w-full sm:w-auto font-bold text-lg transition-all items-center justify-center rounded-xl px-8 py-4
-              ${mode === 'clear' ? 'bg-white border border-gray-200 text-gray-900 hover:bg-gray-50 shadow' : 'bg-white/5 hover:bg-white/10 text-white border border-white/10'}`}> 
+              ${mode === 'clear' ? 'bg-white border border-[#00d969] text-[#3a4b67] hover:bg-gray-50 shadow' : 'bg-white/5 hover:bg-white/10 text-white border border-[#00d969]'}`}> 
               Agendar Consulta
             </Link>
           </div>
@@ -79,10 +79,10 @@ const Hero = () => {
           <div className="flex items-center gap-6 justify-center lg:justify-start pt-4">
             <div className="flex -space-x-3">
               {/* Fotos reais de famílias satisfeitas */}
-              <img src="https://randomuser.me/api/portraits/men/32.jpg" className="w-10 h-10 rounded-full border-2 border-brand-dark object-cover" alt="Família Satisfeita 1" />
-              <img src="https://randomuser.me/api/portraits/women/44.jpg" className="w-10 h-10 rounded-full border-2 border-brand-dark object-cover" alt="Família Satisfeita 2" />
-              <img src="https://randomuser.me/api/portraits/men/65.jpg" className="w-10 h-10 rounded-full border-2 border-brand-dark object-cover" alt="Família Satisfeita 3" />
-              <img src="https://randomuser.me/api/portraits/women/68.jpg" className="w-10 h-10 rounded-full border-2 border-brand-dark object-cover" alt="Família Satisfeita 4" />
+              <img src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/avatars/familia1.jpg" className="w-10 h-10 rounded-full border-2 border-[#00d969] object-cover" alt="Família Satisfeita 1" />
+              <img src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/avatars/familia2.jpg" className="w-10 h-10 rounded-full border-2 border-[#00d969] object-cover" alt="Família Satisfeita 2" />
+              <img src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/avatars/familia3.jpg" className="w-10 h-10 rounded-full border-2 border-[#00d969] object-cover" alt="Família Satisfeita 3" />
+              <img src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/avatars/familia4.jpg" className="w-10 h-10 rounded-full border-2 border-[#00d969] object-cover" alt="Família Satisfeita 4" />
             </div>
             <div className="text-sm">
               <div className="flex text-brand-accent">
@@ -346,12 +346,12 @@ const Calculator = () => {
                 </div>
               </div>
 
-              <div className="grid sm:grid-cols-3 gap-4">
+              <div className="grid sm:grid-cols-2 gap-4">
                 <a 
                   href="https://wa.me/5551996032004"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="bg-brand-primary hover:bg-brand-primary/90 text-white px-4 py-4 rounded-xl font-bold text-sm flex items-center justify-center gap-2 transition-all hover:scale-105"
+                  className="bg-[#00d969] text-[#3a4b67] hover:bg-[#00c75a] px-4 py-4 rounded-xl font-bold text-sm flex items-center justify-center gap-2 transition-all hover:scale-105 border border-[#00d969]"
                 >
                   <MessageCircle size={18} />
                   Falar com Advogado
@@ -365,13 +365,6 @@ const Calculator = () => {
                 >
                   <Zap size={18} />
                   Nova Análise
-                </button>
-                <button 
-                  onClick={() => document.getElementById('serviços')?.scrollIntoView({ behavior: 'smooth' })}
-                  className="bg-brand-primary hover:bg-brand-primary/90 text-white px-4 py-4 rounded-xl font-bold text-sm flex items-center justify-center gap-2 transition-all hover:scale-105"
-                >
-                  <TrendingDown size={18} />
-                  Monte seu Plano
                 </button>
               </div>
             </div>
