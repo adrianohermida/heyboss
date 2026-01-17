@@ -9,6 +9,8 @@
 
 
 import React, { useState, useEffect } from "react";
+import Footer from '../components/Footer';
+import ScrollToTopButton from '../components/ScrollToTopButton';
 import { supabase } from '../../supabaseClient';
 import { useNavigate, Link } from "react-router-dom";
 import { Mail, Lock, ArrowRight, Loader2, KeyRound, MailCheck, LogIn } from "lucide-react";
@@ -107,98 +109,17 @@ const LoginPage = () => {
                 required
                 placeholder="seu@email.com"
                 value={email}
-                onChange={e => setEmail(e.target.value)}
-                className="w-full bg-brand-dark border border-white/10 rounded-xl py-4 pl-12 pr-4 text-white focus:border-brand-primary outline-none transition-all"
-              />
-            </div>
-            <div className="relative">
-              <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-white/30" size={20} />
-              <input
-                type="password"
-                required
-                placeholder="Senha"
-                value={password}
+                return (
+                  <>
+                    <div className="min-h-screen bg-brand-dark flex items-center justify-center px-4 py-12">
+                      {/* ...existing code... */}
+                    </div>
+                    <Footer />
+                    <ScrollToTopButton />
+                  </>
+                );
                 onChange={e => setPassword(e.target.value)}
+
                 className="w-full bg-brand-dark border border-white/10 rounded-xl py-4 pl-12 pr-4 text-white focus:border-brand-primary outline-none transition-all"
+
               />
-            </div>
-            {error && (
-              <div className="bg-red-500/10 border border-red-500/20 text-red-400 px-4 py-3 rounded-xl text-sm text-center">{error}</div>
-            )}
-            <button
-              type="submit"
-              disabled={loading}
-              className="w-full bg-brand-primary hover:bg-brand-primary/90 text-white py-4 rounded-xl font-bold flex items-center justify-center gap-2 transition-all active:scale-95 disabled:opacity-50"
-            >
-              {loading ? <Loader2 className="animate-spin" size={20} /> : "Entrar com Senha"}
-              <ArrowRight size={20} />
-            </button>
-          </form>
-        </div>
-
-        {/* Login social Google */}
-        <div className="mt-4">
-          <button
-            type="button"
-            onClick={handleGoogleLogin}
-            disabled={googleLoading}
-            className="w-full bg-white text-brand-primary border border-brand-primary/30 hover:bg-brand-primary/10 py-3 rounded-xl font-bold flex items-center justify-center gap-2 transition-all active:scale-95 disabled:opacity-50 text-sm shadow"
-          >
-            {googleLoading ? <Loader2 className="animate-spin" size={18} /> : <LogIn size={18} />}
-            Entrar com Google
-          </button>
-        </div>
-
-        {/* Login por link mágico */}
-        <div className="mt-6">
-          <form onSubmit={handleMagicLink} className="space-y-2">
-            <div className="flex items-center gap-2 mb-2">
-              <MailCheck className="text-brand-primary" size={20} />
-              <span className="text-white/80 text-sm font-bold">Acesso via Link Mágico</span>
-            </div>
-            <input
-              type="email"
-              required
-              placeholder="E-mail para link mágico"
-              value={email}
-              onChange={e => setEmail(e.target.value)}
-              className="w-full bg-brand-dark border border-white/10 rounded-xl py-3 px-4 text-white focus:border-brand-primary outline-none transition-all"
-            />
-            {magicError && (
-              <div className="bg-red-500/10 border border-red-500/20 text-red-400 px-4 py-2 rounded-xl text-xs text-center">{magicError}</div>
-            )}
-            {magicSent && (
-              <div className="bg-green-500/10 border border-green-500/20 text-green-400 px-4 py-2 rounded-xl text-xs text-center">Link mágico enviado! Verifique seu e-mail.</div>
-            )}
-            <button
-              type="submit"
-              disabled={magicLoading}
-              className="w-full bg-brand-primary/80 hover:bg-brand-primary text-white py-3 rounded-xl font-bold flex items-center justify-center gap-2 transition-all active:scale-95 disabled:opacity-50 text-sm"
-            >
-              {magicLoading ? <Loader2 className="animate-spin" size={18} /> : "Enviar Link Mágico"}
-              <KeyRound size={18} />
-            </button>
-          </form>
-        </div>
-
-        {/* Recuperação de senha */}
-        <div className="flex flex-col gap-2 mt-6">
-          <Link to="/forgot-password" className="text-brand-primary text-sm hover:underline text-center">Esqueceu a senha?</Link>
-        </div>
-
-        <div className="mt-6 text-xs text-white/40 text-center">
-          <p>Usuário administrador: <span className="text-brand-primary font-bold">adrianohermida@gmail.com</span></p>
-          <p>Colaboradores e clientes: acesso apenas se já cadastrados pelo escritório.</p>
-        </div>
-
-        <p className="text-center text-[10px] text-white/20 mt-4">
-          Ao entrar, você concorda com nossos Termos de Uso e Política de Privacidade.
-        </p>
-      </div>
-    </div>
-  );
-};
-
-export default LoginPage;
-
-
