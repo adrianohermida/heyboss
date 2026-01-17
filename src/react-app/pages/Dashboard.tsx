@@ -1,9 +1,3 @@
-// Forward declarations to fix hoisting issues for JSX usage
-const FaturasModule: React.FC<{ data: any[] }> = () => null;
-const TicketsModule: React.FC<{ data: any[] }> = () => null;
-const IAModule: React.FC<{ data: any[] }> = () => null;
-const AdminAgendaModule: React.FC = () => null;
-const ConfigModule: React.FC<{ status: any; onUpdate: (configType: string, value: any) => Promise<void>; }> = () => null;
 /**
  * @description Painel Administrativo completo para Hermida Maia Advocacia.
  *             Gerencia Leads, Processos, Faturas, Tickets, Publicações e IA.
@@ -14,25 +8,25 @@ const ConfigModule: React.FC<{ status: any; onUpdate: (configType: string, value
 import React, { useState, useEffect, useMemo } from 'react';
 import { useAuth } from '@hey-boss/users-service/react';
 import { useNavigate, Link, useSearchParams } from 'react-router-dom';
-import { 
-  Users, 
-  Scale, 
-  CreditCard, 
-  MessageSquare, 
-  FileText, 
-  Settings, 
-  LayoutDashboard, 
-  Search, 
-  Filter, 
-  Download, 
-  Plus, 
-  MoreVertical, 
-  ChevronRight, 
-  Loader2, 
-  AlertCircle, 
-  CheckCircle2, 
-  Clock, 
-  TrendingUp, 
+import {
+  Users,
+  Scale,
+  CreditCard,
+  MessageSquare,
+  FileText,
+  Settings,
+  LayoutDashboard,
+  Search,
+  Filter,
+  Download,
+  Plus,
+  MoreVertical,
+  ChevronRight,
+  Loader2,
+  AlertCircle,
+  CheckCircle2,
+  Clock,
+  TrendingUp,
   ShieldCheck,
   ExternalLink,
   Bot,
@@ -50,7 +44,6 @@ import { BalcaoVirtualModule } from '../components/BalcaoVirtual/BalcaoVirtualMo
 import { ChatbotConfigModule } from '../components/ChatbotConfigModule';
 import { BlogManagementModule } from '../components/BlogManagement/BlogManagementModule';
 import { PublicacoesModule } from '../components/Publicacoes/PublicacoesModule';
-
 
 const clsx = (...classes: any[]) => classes.filter(Boolean).join(' ');
 
@@ -382,7 +375,8 @@ const ProcessosModule = ({ data }: { data: any[] }) => {
       </div>
     ))}
   </div>
-);
+  );
+};
 
 const FaturasModule = ({ data }: { data: any[] }) => {
   const [statusFilter, setStatusFilter] = useState('all');
