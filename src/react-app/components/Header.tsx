@@ -1,5 +1,3 @@
-
-
 /**
  * @description Componente de cabeçalho global para o site Hermida Maia Advocacia.
  *             Gerencia a navegação principal e o estado de autenticação do usuário.
@@ -9,9 +7,34 @@
  */
 
 import React, { useState, useRef, useEffect } from 'react';
+import { useTheme } from '../../styles/ThemeProvider';
 import { Link, useNavigate } from 'react-router-dom';
 import { User, LogOut, Briefcase, ChevronDown, LayoutDashboard, Menu, X, Shield, Settings } from 'lucide-react';
 import { useAuth } from '@hey-boss/users-service/react';
+
+// Componente de logo adaptável
+export function LogoHM({ size = 48, rounded = true, bg = 'var(--color-brand)' }: { size?: number, rounded?: boolean, bg?: string }) {
+  return (
+    <div
+      style={{
+        width: size,
+        height: size,
+        background: bg,
+        borderRadius: rounded ? 16 : 0,
+        overflow: 'hidden',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+      }}
+    >
+      <img
+        src="https://heyboss.heeyo.ai/user-assets/logo_lzI6JHzO.png"
+        alt="Logo HM Advocacia"
+        style={{ width: '80%', height: '80%', objectFit: 'contain', borderRadius: rounded ? 12 : 0 }}
+      />
+    </div>
+  );
+}
 
 const Header = () => {
   const { user, logout } = useAuth();
@@ -44,14 +67,24 @@ const Header = () => {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
+  const { mode, setMode } = useTheme();
+
   return (
     <header className="fixed top-0 w-full z-50 bg-brand-dark/90 backdrop-blur-md border-b border-white/10">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-20">
           <Link to="/" className="flex items-center gap-3">
-            <div className="bg-brand-primary rounded-xl overflow-hidden w-12 h-12 flex items-center justify-center">
-              <img src="https://heyboss.heeyo.ai/user-assets/logo_lzI6JHzO.png" alt="Logo Hermida Maia Advocacia" className="w-full h-full object-cover" />
-            </div>
+                      {/* Switch de tema */}
+                      <div className="ml-6 flex items-center gap-2">
+                        <button
+                          onClick={() => setMode(mode === 'clear' ? 'dark' : 'clear')}
+                          className="px-3 py-2 rounded-xl bg-brand-primary text-white text-xs font-bold shadow hover:bg-brand-accent transition-all"
+                          title={mode === 'clear' ? 'Modo Escuro' : 'Modo Claro'}
+                        >
+                          {mode === 'clear' ? '🌙 Escuro' : '☀️ Claro'}
+                        </button>
+                      </div>
+            <LogoHM size={48} rounded={true} bg={mode === 'clear' ? 'var(--color-brand)' : 'var(--color-brand)'} />
             <div className="flex flex-col">
               <span className="text-white font-extrabold text-lg leading-tight">Dr. Adriano Hermida Maia</span>
               <span className="text-brand-primary text-xs font-semibold uppercase tracking-wider">Defesa do Superendividado</span>

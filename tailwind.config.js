@@ -9,11 +9,20 @@ export default {
     extend: {
       colors: {
         brand: {
-          dark: '#0a0e1a',
-          primary: '#0d9c6e',
-          accent: '#f59e0b',
-          elevated: '#161b2b',
-          secondary: '#0f172a',
+          dark: 'var(--color-bg-dark)',
+          primary: 'var(--color-brand)',
+          accent: 'var(--color-accent)',
+          elevated: 'var(--color-card)',
+          secondary: 'var(--color-bg-clear)',
+        },
+        text: {
+          DEFAULT: 'var(--color-text)',
+        },
+        card: {
+          DEFAULT: 'var(--color-card)',
+        },
+        border: {
+          DEFAULT: 'var(--color-border)',
         }
       },
       fontFamily: {
