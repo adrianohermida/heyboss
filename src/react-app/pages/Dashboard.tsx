@@ -1,3 +1,9 @@
+// Forward declarations to fix hoisting issues for JSX usage
+const FaturasModule: React.FC<{ data: any[] }> = () => null;
+const TicketsModule: React.FC<{ data: any[] }> = () => null;
+const IAModule: React.FC<{ data: any[] }> = () => null;
+const AdminAgendaModule: React.FC = () => null;
+const ConfigModule: React.FC<{ status: any; onUpdate: (configType: string, value: any) => Promise<void>; }> = () => null;
 /**
  * @description Painel Administrativo completo para Hermida Maia Advocacia.
  *             Gerencia Leads, Processos, Faturas, Tickets, Publicações e IA.
@@ -76,18 +82,17 @@ const Dashboard = () => {
 
   // Fetch data based on active tab
   useEffect(() => {
-    if (activeTab === 'overview') return;
     
     const fetchData = async () => {
       setLoading(true);
       try {
         let endpoint = '';
-        if (activeTab === 'crm') endpoint = '/api/admin/leads';
+        if (activeTab === 'leads') endpoint = '/api/admin/leads';
         else if (activeTab === 'processos') endpoint = '/api/admin/processos';
         else if (activeTab === 'faturas') endpoint = '/api/admin/faturas';
         else if (activeTab === 'tickets') endpoint = '/api/tickets'; // Admin sees all via backend logic
         else if (activeTab === 'publicacoes') endpoint = '/api/admin/publicacoes';
-        else if (activeTab === 'ia') endpoint = '/api/admin/ai-interactions';
+        else if (activeTab === 'ai') endpoint = '/api/admin/ai-interactions';
         else if (activeTab === 'config') endpoint = '/api/admin/integrations/status';
 
         if (endpoint) {
@@ -128,7 +133,7 @@ const Dashboard = () => {
   }, [data, searchTerm]);
 
   const handleExport = async () => {
-    if (activeTab === 'crm') {
+    if (activeTab === 'leads') {
       window.open('/api/admin/leads/export', '_blank');
     } else {
       alert('Exportação para este módulo em breve.');
@@ -163,17 +168,16 @@ const Dashboard = () => {
             <nav className="space-y-1">
               {
                 [
-                  { id: 'overview', label: 'Visão Geral', icon: LayoutDashboard },
-                  { id: 'crm', label: 'CRM / Leads', icon: Users },
+                  { id: 'leads', label: 'CRM / Leads', icon: Users },
                   { id: 'processos', label: 'Processos', icon: Scale },
                   { id: 'faturas', label: 'Financeiro', icon: CreditCard },
                   { id: 'tickets', label: 'Helpdesk', icon: MessageSquare },
                   { id: 'publicacoes', label: 'Publicações', icon: FileText },
-                  { id: 'ia', label: 'IA Monitorada', icon: Bot },
+                  { id: 'ai', label: 'IA Monitorada', icon: Bot },
                   { id: 'chatbot', label: 'Chatbot IA', icon: Settings },
                   { id: 'balcao', label: 'Balcão Virtual', icon: MessageSquare },
+                  { id: 'agenda', label: 'Agenda', icon: Calendar },
                   { id: 'config', label: 'Configurações', icon: Settings },
-                  { id: 'agenda', label: 'Agenda', icon: CalendarIcon },
                 ].map((item) => (
                   <button
                     key={item.id}
@@ -198,7 +202,7 @@ const Dashboard = () => {
           {/* Content */}
           <div className="flex-1 min-w-0 space-y-6">
             {/* Header Actions */}
-            {activeTab !== 'overview' && activeTab !== 'config' && (
+            {activeTab !== 'config' && (
               <div className="flex flex-col sm:flex-row gap-4 items-center justify-between bg-brand-elevated p-4 rounded-2xl border border-white/5">
                 <div className="relative w-full sm:w-96">
                   <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-white/20" size={18} />
@@ -230,13 +234,12 @@ const Dashboard = () => {
               </div>
             ) : (
               <div className="animate-fade-in">
-                {activeTab === 'overview' && <OverviewModule />}
-                {activeTab === 'crm' && <CRMModule data={filteredData} />}
+                {activeTab === 'leads' && <CRMModule data={filteredData} />}
                 {activeTab === 'processos' && <ProcessosModule data={filteredData} />}
                 {activeTab === 'faturas' && <FaturasModule data={filteredData} />}
                 {activeTab === 'tickets' && <TicketsModule data={filteredData} />}
                 {activeTab === 'publicacoes' && <PublicacoesModule />}
-                {activeTab === 'ia' && <IAModule data={filteredData} />}
+                {activeTab === 'ai' && <IAModule data={filteredData} />}
                 {activeTab === 'chatbot' && <ChatbotConfigModule />}
                 {activeTab === 'balcao' && <BalcaoVirtualModule />}
                 {activeTab === 'agenda' && <AdminAgendaModule />}
@@ -344,7 +347,9 @@ const CRMModule = ({ data }: { data: any[] }) => (
   </div>
 );
 
-const ProcessosModule = ({ data }: { data: any[] }) => (
+const ProcessosModule = ({ data }: { data: any[] }) => {
+  const navigate = useNavigate();
+  return (
   <div className="grid gap-4">
     {data.map((proc, i) => (
       <div key={i} className="bg-brand-elevated p-6 rounded-2xl border border-white/5 hover:border-brand-primary/30 transition-all group shadow-xl">
@@ -662,7 +667,7 @@ const AdminAgendaModule = () => {
             <div key={idx} className="bg-brand-elevated p-6 rounded-2xl border border-white/5 hover:border-brand-primary/30 transition-all group">
               <div className="flex flex-col md:flex-row justify-between gap-6">
                 <div className="flex gap-4">
-                  <div className={cn(
+                  <div className={clsx(
                     "w-14 h-14 rounded-2xl flex items-center justify-center shadow-inner",
                     app.status === 'confirmado' ? "bg-green-500/10 text-green-400" : 
                     app.status === 'aguardando_aceite' ? "bg-yellow-500/10 text-yellow-400" : "bg-white/5 text-white/20"
@@ -683,7 +688,7 @@ const AdminAgendaModule = () => {
                 </div>
 
                 <div className="flex flex-col items-end justify-between gap-4">
-                  <span className={cn(
+                  <span className={clsx(
                     "text-[10px] font-bold uppercase px-4 py-1.5 rounded-full shadow-lg",
                     app.status === 'confirmado' ? "bg-green-500/10 text-green-400" : 
                     app.status === 'aguardando_aceite' ? "bg-yellow-500/10 text-yellow-400" : "bg-red-500/10 text-red-400"
