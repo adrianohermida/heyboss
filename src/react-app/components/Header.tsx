@@ -69,15 +69,19 @@ const Header = () => {
 
   const { mode, setMode } = useTheme();
 
+  const { mode } = useTheme();
+  const headerBg = mode === 'clear' ? 'bg-white border-b border-gray-200' : 'bg-brand-dark border-b border-white/10';
+  const textMain = mode === 'clear' ? 'text-brand-dark' : 'text-white';
+  const textSub = mode === 'clear' ? 'text-brand-primary' : 'text-brand-primary';
   return (
-    <header className="fixed top-0 w-full z-50 bg-brand-dark border-b border-white/10">
+    <header className={`fixed top-0 w-full z-50 ${headerBg}`}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-20">
           <Link to="/" className="flex items-center gap-4">
             <LogoHM size={48} rounded={true} bg={'var(--color-brand)'} />
             <div className="flex flex-col ml-2">
-              <span className="text-white font-extrabold text-lg leading-tight">Dr. Adriano Hermida Maia</span>
-              <span className="text-brand-primary text-xs font-semibold uppercase tracking-wider">Defesa do Superendividado</span>
+              <span className={`font-extrabold text-lg leading-tight ${textMain}`}>Dr. Adriano Hermida Maia</span>
+              <span className={`text-xs font-semibold uppercase tracking-wider ${textSub}`}>Defesa do Superendividado</span>
             </div>
           </Link>
           {/* Desktop Navigation */}
