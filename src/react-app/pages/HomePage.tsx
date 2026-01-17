@@ -38,8 +38,13 @@ import allConfigs from '../../shared/form-configs.json';
 
 // --- Components ---
 
-const Hero = () => (
-  <section className="relative pt-32 pb-20 lg:pt-48 lg:pb-32 overflow-hidden">
+import { useTheme } from '../../styles/ThemeProvider';
+const Hero = () => {
+  const { mode } = useTheme();
+  const bg = mode === 'clear' ? 'bg-white' : 'bg-brand-dark';
+  const text = mode === 'clear' ? 'text-brand-dark' : 'text-white';
+  return (
+    <section className={`relative pt-32 pb-20 lg:pt-48 lg:pb-32 overflow-hidden ${bg}`}>
     <div className="absolute top-0 left-0 w-full h-full bg-[radial-gradient(circle_at_30%_30%,#0d9c6e15_0%,transparent_50%)]" />
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
       <div className="grid lg:grid-cols-2 gap-12 items-center">
@@ -49,11 +54,10 @@ const Hero = () => (
             <span className="text-brand-accent text-xs font-bold uppercase tracking-widest">Lei 14.181/2021 - Superendividamento</span>
           </div>
           
-          <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold text-white leading-[1.1] sm:!text-[53px]">
+          <h1 className={`text-4xl sm:text-5xl lg:text-6xl font-extrabold ${text} leading-[1.1] sm:!text-[53px]`}>
             Advogado Especialista em Superendividamento: Parcele suas <span className="text-brand-primary">dívidas</span> em até 5 anos
           </h1>
-          
-          <p className="text-lg text-white/70 max-w-xl mx-auto lg:mx-0 leading-relaxed">
+          <p className={`text-lg ${mode === 'clear' ? 'text-brand-dark/70' : 'text-white/70'} max-w-xl mx-auto lg:mx-0 leading-relaxed`}>
             Advocacia especializada em superendividamento e defesa do consumidor. Mais de R$ 35 milhões em redução de dívidas renegociados em todo o Brasil. Recupere sua paz financeira hoje.
           </p>
           
@@ -72,20 +76,17 @@ const Hero = () => (
 
           <div className="flex items-center gap-6 justify-center lg:justify-start pt-4">
             <div className="flex -space-x-3">
-              {[1, 2, 3, 4].map((i) => (
-                <img 
-                  key={i} 
-                  src={`https://ui-avatars.com/api/?name=User+${i}&background=0d9c6e&color=fff`} 
-                  className="w-10 h-10 rounded-full border-2 border-brand-dark" 
-                  alt="User" 
-                />
-              ))}
+              {/* Fotos reais de famílias satisfeitas */}
+              <img src="https://randomuser.me/api/portraits/men/32.jpg" className="w-10 h-10 rounded-full border-2 border-brand-dark object-cover" alt="Família Satisfeita 1" />
+              <img src="https://randomuser.me/api/portraits/women/44.jpg" className="w-10 h-10 rounded-full border-2 border-brand-dark object-cover" alt="Família Satisfeita 2" />
+              <img src="https://randomuser.me/api/portraits/men/65.jpg" className="w-10 h-10 rounded-full border-2 border-brand-dark object-cover" alt="Família Satisfeita 3" />
+              <img src="https://randomuser.me/api/portraits/women/68.jpg" className="w-10 h-10 rounded-full border-2 border-brand-dark object-cover" alt="Família Satisfeita 4" />
             </div>
             <div className="text-sm">
               <div className="flex text-brand-accent">
                 {[1, 2, 3, 4, 5].map((i) => <Star key={i} size={14} fill="currentColor" />)}
               </div>
-              <p className="text-white/60 font-medium">+2.500 clientes satisfeitos</p>
+              <p className="text-white/60 font-medium">+2.500 famílias satisfeitas</p>
             </div>
           </div>
         </div>
@@ -132,12 +133,16 @@ const Hero = () => (
 </section>
 );
 
-const Stats = () => (
-  <section className="py-20 bg-brand-secondary">
+const Stats = () => {
+  const { mode } = useTheme();
+  const bg = mode === 'clear' ? 'bg-gray-50' : 'bg-brand-secondary';
+  const text = mode === 'clear' ? 'text-brand-dark' : 'text-white';
+  return (
+    <section className={`py-20 ${bg}`}>
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       <div className="text-center mb-16">
-        <h2 className="text-3xl sm:text-4xl font-extrabold text-white mb-4">Resultados Reais na Redução e Renegociação de Dívidas</h2>
-        <p className="text-white/60 max-w-2xl mx-auto">Nossa advocacia especializada em dívidas foca em resultados reais para quem busca o fim das cobranças abusivas e a solução rápida para dívidas.</p>
+        <h2 className={`text-3xl sm:text-4xl font-extrabold ${text} mb-4`}>Resultados Reais na Redução e Renegociação de Dívidas</h2>
+        <p className={`${mode === 'clear' ? 'text-brand-dark/60' : 'text-white/60'} max-w-2xl mx-auto`}>Nossa advocacia especializada em dívidas foca em resultados reais para quem busca o fim das cobranças abusivas e a solução rápida para dívidas.</p>
       </div>
       
       <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
@@ -161,6 +166,8 @@ const Stats = () => (
 );
 
 const Calculator = () => {
+  const { mode } = useTheme();
+  const bg = mode === 'clear' ? 'bg-white' : 'bg-brand-dark';
   const [formData, setFormData] = React.useState({
     totalDebt: '',
     monthlyInstallment: '',
@@ -228,10 +235,10 @@ const Calculator = () => {
   };
 
   return (
-    <section id="calculadora" className="py-24 bg-brand-dark relative overflow-hidden">
+    <section id="calculadora" className={`py-24 ${bg} relative overflow-hidden`}>
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-brand-primary/5 rounded-full blur-[120px] pointer-events-none" />
       <div className="max-w-4xl mx-auto px-4 relative z-10">
-        <div className="bg-brand-elevated rounded-[2.5rem] p-8 sm:p-12 border border-white/10 shadow-2xl">
+        <div className={`rounded-[2.5rem] p-8 sm:p-12 border shadow-2xl ${mode === 'clear' ? 'bg-white border-gray-200' : 'bg-brand-elevated border-white/10'}`}>
           <div className="text-center mb-12">
             <h2 className="text-3xl sm:text-4xl font-extrabold text-white mb-4">Calculadora de Superendividamento: Veja como Eliminar Dívidas</h2>
             <p className="text-white/60">Descubra em minutos se você tem direito à Lei 14.181/2021 para renegociar dívidas até 70% e sair do sufoco financeiro.</p>
