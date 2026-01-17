@@ -4,29 +4,43 @@ import PublicacoesImport from '../Publicacoes/PublicacoesImport';
 import PublicacoesAuditLog from '../Publicacoes/PublicacoesAuditLog';
 import PublicacoesIAExtract from '../Publicacoes/PublicacoesIAExtract';
 import TarefasPendenciasModule from '../Tarefas/TarefasPendenciasModule';
-import { supabase } from '../../supabaseClient';
 
 const ClientPortal = () => {
   // Observação: Integração futura com módulo de Tarefas/Prazos para registro de pendências e prazos relacionados às publicações.
   const [publicacoes, setPublicacoes] = useState([]);
-  const [processos, setProcessos] = useState([]);
-  const [clientes, setClientes] = useState([]);
+  const [analytics, setAnalytics] = useState({});
+  const [pendencias, setPendencias] = useState([]);
 
   useEffect(() => {
     async function fetchData() {
-      const { data: pubs } = await supabase.from('publicacoes').select('*');
-      setPublicacoes(pubs || []);
-      const { data: procs } = await supabase.from('processos').select('*');
-      setProcessos(procs || []);
-      const { data: clis } = await supabase.from('clientes').select('*');
-      setClientes(clis || []);
+      try {
+        const pubsRes = await fetch('/api/admin/publicacoes');
+        const pubs = pubsRes.ok ? await pubsRes.json() : [];
+        setPublicacoes(pubs);
+      } catch (e) {
+        setPublicacoes([]);
+      }
+      try {
+        const statsRes = await fetch('/api/admin/balcao/stats');
+        const stats = statsRes.ok ? await statsRes.json() : {};
+        setAnalytics(stats);
+      } catch (e) {
+        setAnalytics({});
+      }
+      try {
+        const pendRes = await fetch('/api/admin/queues');
+        const pend = pendRes.ok ? await pendRes.json() : [];
+        setPendencias(pend);
+      } catch (e) {
+        setPendencias([]);
+      }
     }
     fetchData();
   }, []);
 
   const selectedPublicacaoId = publicacoes[0]?.id;
-  const selectedProcessoId = processos[0]?.id;
-  const selectedClienteId = clientes[0]?.id;
+  const selectedProcessoId = null;
+  const selectedClienteId = null;
   const handleImportPublicacoes = (imported) => {
     setPublicacoes([...publicacoes, ...imported]);
   };
