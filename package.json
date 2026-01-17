@@ -1,1 +1,1 @@
-{"scripts":{"deploy":"wrangler deploy --env production"}}
+{"scripts":{"build":"vite build","deploy":"wrangler deploy --env production"}}
