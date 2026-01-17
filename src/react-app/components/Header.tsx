@@ -69,7 +69,6 @@ const Header = () => {
 
   const { mode, setMode } = useTheme();
 
-  const { mode } = useTheme();
   const headerBg = mode === 'clear' ? 'bg-white border-b border-gray-200' : 'bg-brand-dark border-b border-white/10';
   const textMain = mode === 'clear' ? 'text-gray-900' : 'text-white';
   const textSub = mode === 'clear' ? 'text-brand-primary' : 'text-brand-primary';
