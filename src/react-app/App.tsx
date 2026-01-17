@@ -1,6 +1,5 @@
 const AboutPage2 = lazy(() => import('./pages/AboutPage2'));
 const ContactPage2 = lazy(() => import('./pages/ContactPage2'));
-const AppointmentsPage2 = lazy(() => import('./pages/AppointmentsPage2'));
 import { Routes, Route, useLocation } from 'react-router-dom'
 import { lazy, Suspense } from 'react'
 
@@ -65,7 +64,6 @@ export default function App() {
           <Route path="/checkout/error" element={<CheckoutErrorPage />} />
           <Route path="/checkout/cancel" element={<CheckoutCancelPage />} />
           <Route path="/appointments" element={<AppointmentsPage />} />
-          <Route path="/appointments2" element={<AppointmentsPage2 />} />
           <Route path="/auth/callback" element={<AuthCallback />} />
           {/* Protected Routes */}
           <Route element={<AuthProtect />}>
