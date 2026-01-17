@@ -70,7 +70,7 @@ const Hero = () => {
               Calcular Gratuitamente
               <ArrowRight size={20} className="group-hover:translate-x-1 transition-transform" />
             </button>
-            <Link to="/appointments" className={`hidden sm:flex w-full sm:w-auto font-bold text-lg transition-all items-center justify-center rounded-xl px-8 py-4
+            <Link to="/appointments" className={`w-full sm:w-auto font-bold text-lg transition-all items-center justify-center rounded-xl px-8 py-4
               ${mode === 'clear' ? 'bg-white border border-gray-200 text-gray-900 hover:bg-gray-50 shadow' : 'bg-white/5 hover:bg-white/10 text-white border border-white/10'}`}> 
               Agendar Consulta
             </Link>
