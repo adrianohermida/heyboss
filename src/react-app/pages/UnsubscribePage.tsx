@@ -71,9 +71,6 @@ export const UnsubscribePage: React.FC = () => {
       <ScrollToTopButton />
     </>
   );
-
-
-  );
 }
 
 export default UnsubscribePage;

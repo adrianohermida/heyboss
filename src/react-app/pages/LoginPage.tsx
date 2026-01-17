@@ -109,17 +109,6 @@ const LoginPage = () => {
                 required
                 placeholder="seu@email.com"
                 value={email}
-                return (
-                  <>
-                    <div className="min-h-screen bg-brand-dark flex items-center justify-center px-4 py-12">
-                      {/* ...existing code... */}
-                    </div>
-                    <Footer />
-                    <ScrollToTopButton />
-                  </>
-                );
-                onChange={e => setPassword(e.target.value)}
-
+                onChange={e => setEmail(e.target.value)}
                 className="w-full bg-brand-dark border border-white/10 rounded-xl py-4 pl-12 pr-4 text-white focus:border-brand-primary outline-none transition-all"
-
               />
