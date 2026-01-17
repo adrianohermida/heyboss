@@ -1,4 +1,3 @@
-
 /**
  * @description Página "Sobre" para Hermida Maia Advocacia.
  *             Apresenta a trajetória do Dr. Adriano Hermida Maia, a missão do escritório
@@ -26,6 +25,7 @@ import {
   ExternalLink
 } from 'lucide-react';
 import Header from '../components/Header';
+import ScrollToTopButton from '../components/ScrollToTopButton';
 
 const AboutHero = () => (
   <section className="relative pt-32 pb-20 lg:pt-48 lg:pb-32 overflow-hidden bg-brand-dark">
@@ -318,46 +318,49 @@ const AboutPage = () => {
   }, []);
 
   return (
-    <div className="min-h-screen bg-brand-dark text-white selection:bg-brand-primary selection:text-white">
-      <Header />
-      <main>
-        <AboutHero />
-        <ProfileSection />
-        <Timeline />
-        <MissionVisionValues />
-        <StatsSection />
-        <PodcastSection />
-        <WorksSection />
-        
-        <section className="py-24 bg-brand-secondary">
-          <div className="max-w-4xl mx-auto px-4 text-center">
-            <h2 className="text-3xl sm:text-4xl font-extrabold mb-8 text-white">Pronto para recomeçar sua história?</h2>
-            <p className="text-white/60 text-lg mb-12">
-              Não deixe que as dívidas definam quem você é. Nossa equipe está pronta para aplicar a lei a seu favor e devolver sua liberdade.
-            </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <a 
-                href="https://wa.me/5551996032004" 
-                target="_blank" 
-                rel="noopener noreferrer"
-                className="bg-brand-primary hover:bg-brand-primary/90 text-white px-10 py-5 rounded-2xl font-extrabold text-xl shadow-2xl transition-all hover:scale-105 flex items-center justify-center gap-3"
-              >
-                <MessageCircle size={24} />
-                Falar com Especialista
-              </a>
-              <Link 
-                to="/contato"
-                className="bg-white/5 hover:bg-white/10 text-white border border-white/10 px-10 py-5 rounded-2xl font-extrabold text-xl transition-all flex items-center justify-center gap-3"
-              >
-                Agendar Consulta
-                <ArrowRight size={24} />
-              </Link>
+    <>
+      <div className="min-h-screen bg-brand-dark text-white selection:bg-brand-primary selection:text-white">
+        <Header />
+        <main>
+          <AboutHero />
+          <ProfileSection />
+          <Timeline />
+          <MissionVisionValues />
+          <StatsSection />
+          <PodcastSection />
+          <WorksSection />
+          
+          <section className="py-24 bg-brand-secondary">
+            <div className="max-w-4xl mx-auto px-4 text-center">
+              <h2 className="text-3xl sm:text-4xl font-extrabold mb-8 text-white">Pronto para recomeçar sua história?</h2>
+              <p className="text-white/60 text-lg mb-12">
+                Não deixe que as dívidas definam quem você é. Nossa equipe está pronta para aplicar a lei a seu favor e devolver sua liberdade.
+              </p>
+              <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                <a 
+                  href="https://wa.me/5551996032004" 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="bg-brand-primary hover:bg-brand-primary/90 text-white px-10 py-5 rounded-2xl font-extrabold text-xl shadow-2xl transition-all hover:scale-105 flex items-center justify-center gap-3"
+                >
+                  <MessageCircle size={24} />
+                  Falar com Especialista
+                </a>
+                <Link 
+                  to="/contato"
+                  className="bg-white/5 hover:bg-white/10 text-white border border-white/10 px-10 py-5 rounded-2xl font-extrabold text-xl transition-all flex items-center justify-center gap-3"
+                >
+                  Agendar Consulta
+                  <ArrowRight size={24} />
+                </Link>
+              </div>
             </div>
-          </div>
-        </section>
-      </main>
-      <Footer />
-    </div>
+          </section>
+        </main>
+        <Footer />
+      </div>
+      <ScrollToTopButton />
+    </>
   );
 };
 
