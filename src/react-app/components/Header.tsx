@@ -70,27 +70,16 @@ const Header = () => {
   const { mode, setMode } = useTheme();
 
   return (
-    <header className="fixed top-0 w-full z-50 bg-brand-dark/90 backdrop-blur-md border-b border-white/10">
+    <header className="fixed top-0 w-full z-50 bg-brand-dark border-b border-white/10">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-20">
-          <Link to="/" className="flex items-center gap-3">
-                      {/* Switch de tema */}
-                      <div className="ml-6 flex items-center gap-2">
-                        <button
-                          onClick={() => setMode(mode === 'clear' ? 'dark' : 'clear')}
-                          className="px-3 py-2 rounded-xl bg-brand-primary text-white text-xs font-bold shadow hover:bg-brand-accent transition-all"
-                          title={mode === 'clear' ? 'Modo Escuro' : 'Modo Claro'}
-                        >
-                          {mode === 'clear' ? '🌙 Escuro' : '☀️ Claro'}
-                        </button>
-                      </div>
-            <LogoHM size={48} rounded={true} bg={mode === 'clear' ? 'var(--color-brand)' : 'var(--color-brand)'} />
-            <div className="flex flex-col">
+          <Link to="/" className="flex items-center gap-4">
+            <LogoHM size={48} rounded={true} bg={'var(--color-brand)'} />
+            <div className="flex flex-col ml-2">
               <span className="text-white font-extrabold text-lg leading-tight">Dr. Adriano Hermida Maia</span>
               <span className="text-brand-primary text-xs font-semibold uppercase tracking-wider">Defesa do Superendividado</span>
             </div>
           </Link>
-          
           {/* Desktop Navigation */}
           <nav className="hidden lg:flex items-center gap-8">
             <Link to="/" className="text-white/80 hover:text-brand-primary transition-colors text-sm font-medium">Início</Link>
@@ -170,18 +159,6 @@ const Header = () => {
               </Link>
             )}
           </nav>
-
-          {/* Desktop CTA - "Monte Seu Plano" */}
-          <div className="hidden lg:flex items-center gap-4">
-            <a 
-              href="https://wa.me/5551996032004" 
-              target="_blank" 
-              rel="noopener noreferrer"
-              className="bg-brand-primary hover:bg-brand-primary/90 text-white px-5 py-2.5 rounded-full flex items-center gap-2 text-sm font-bold transition-all hover:scale-105 shadow-lg shadow-brand-primary/20"
-            >
-              <span>Monte Seu Plano</span>
-            </a>
-          </div>
 
           {/* Mobile Menu Button */}
           <div className="lg:hidden flex items-center gap-4">
