@@ -20,6 +20,9 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     });
     root.classList.remove('theme-clear', 'theme-dark');
     root.classList.add(`theme-${mode}`);
+    // Forçar fundo sólido e texto consistente
+    root.style.setProperty('background-color', themeColors.bg);
+    root.style.setProperty('color', themeColors.text);
   }, [mode]);
 
   return (
