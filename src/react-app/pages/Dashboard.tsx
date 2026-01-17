@@ -19,6 +19,12 @@ import FaturasModule from '../components/Dashboard/FaturasModule';
 import TicketsModule from '../components/Dashboard/TicketsModule';
 import clsx from 'clsx';
 import { CreditCard, Download, Search, MessageSquare, ChevronRight, Bot, Zap, CheckCircle2, Clock, AlertCircle, Calendar, Settings, Chrome, Loader2 } from 'lucide-react';
+// Add missing tab modules used by the dashboard
+import { PublicacoesModule } from '../components/Publicacoes/PublicacoesModule';
+import { AIMonitoringModule } from '../components/AIMonitoring/AIMonitoringModule';
+import { BalcaoVirtualModule } from '../components/BalcaoVirtual/BalcaoVirtualModule';
+import { ChatbotConfigModule } from '../components/ChatbotConfigModule';
+import { BlogManagementModule } from '../components/BlogManagement/BlogManagementModule';
 
 const Dashboard: React.FC = () => {
   // ...hooks e lógica modular aqui...
@@ -47,6 +53,12 @@ const Dashboard: React.FC = () => {
                 {activeTab === 'processos' && <ProcessosModule data={filteredData} />}
                 {activeTab === 'faturas' && <FaturasModule data={filteredData} />}
                 {activeTab === 'tickets' && <TicketsModule data={filteredData} />}
+                {activeTab === 'publicacoes' && <PublicacoesModule />}
+                {activeTab === 'ai' && <IAModule data={filteredData} />}
+                {activeTab === 'chatbot' && <ChatbotConfigModule />}
+                {activeTab === 'balcao' && <BalcaoVirtualModule />}
+                {activeTab === 'blog' && <BlogManagementModule />}
+                {activeTab === 'agenda' && <AdminAgendaModule />}
                 {activeTab === 'overview' && <OverviewModule />}
                 {activeTab === 'config' && <ConfigModule />}
                 {/* Adicione outros módulos conforme modularização */}
@@ -59,118 +71,7 @@ const Dashboard: React.FC = () => {
   );
 };
 
-// Dummy data and handlers for the misplaced code block
-const filteredFaturas = [];
-const localSearch = '';
-const setLocalSearch = (_: any) => {};
-const handleCreateLink = (id: any) => {};
-const statusFilter = 'all';
-const s = 'all';
-
-// --- Move misplaced code block into a function for clarity ---
-function MisplacedBlock() {
-  return (
-    <>
-      <div
-        className={clsx(
-          "px-4 py-2 rounded-xl text-xs font-bold transition-all border",
-          statusFilter === s
-            ? "bg-brand-primary border-brand-primary text-white"
-            : "bg-white/5 border-white/10 text-white/40 hover:text-white"
-        )}
-      >
-        {s === 'all' ? 'Todos' : s}
-      </div>
-      <div className="relative w-full sm:w-64">
-        <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-white/20" size={16} />
-        <input
-          type="text"
-          placeholder="Filtrar nesta aba..."
-          value={localSearch}
-          onChange={(e) => setLocalSearch(e.target.value)}
-          className="w-full bg-brand-dark border border-white/10 rounded-xl py-2 pl-10 pr-4 text-xs outline-none focus:border-brand-primary transition-all"
-        />
-      </div>
-      {/* Tabela de Faturas */}
-      <div className="bg-brand-elevated rounded-3xl border border-white/5 overflow-hidden shadow-2xl">
-        <div className="overflow-x-auto">
-          <table className="w-full text-left border-collapse">
-            <thead>
-              <tr className="bg-white/5 text-[10px] font-bold uppercase tracking-widest text-white/40">
-                <th className="px-6 py-4">Fatura / Cliente</th>
-                <th className="px-6 py-4">Vencimento</th>
-                <th className="px-6 py-4">Valor</th>
-                <th className="px-6 py-4">Status</th>
-                <th className="px-6 py-4 text-right">Ações</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-white/5">
-              {filteredFaturas.map((fatura: any, i: number) => (
-                <tr key={i} className="hover:bg-white/5 transition-colors group">
-                  <td className="px-6 py-4">
-                    <div className="flex items-center gap-3">
-                      <div className={clsx(
-                        "w-8 h-8 rounded-lg flex items-center justify-center font-bold text-xs",
-                        fatura.status === 'Pago' ? "bg-green-500/20 text-green-400" : "bg-yellow-500/20 text-yellow-400"
-                      )}>
-                        {fatura.fatura.slice(-2)}
-                      </div>
-                      <div>
-                        <p className="text-sm font-bold">{fatura.fatura}</p>
-                        <p className="text-[10px] text-white/40">{fatura.cliente_email}</p>
-                      </div>
-                    </div>
-                  </td>
-                  <td className="px-6 py-4">
-                    <p className="text-xs text-white/60">{new Date(fatura.data_vencimento).toLocaleDateString('pt-BR')}</p>
-                  </td>
-                  <td className="px-6 py-4">
-                    <p className="text-sm font-extrabold">R$ {Number(fatura.valor_original).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</p>
-                  </td>
-                  <td className="px-6 py-4">
-                    <span className={clsx(
-                      "text-[10px] font-bold uppercase px-2 py-1 rounded-md",
-                      fatura.status === 'Pago' ? "bg-green-500/10 text-green-400" :
-                        fatura.status === 'Atrasado' ? "bg-red-500/10 text-red-400" : "bg-yellow-500/10 text-yellow-400"
-                    )}>
-                      {fatura.status}
-                    </span>
-                  </td>
-                  <td className="px-6 py-4 text-right">
-                    <div className="flex justify-end gap-2">
-                      {fatura.status !== 'Pago' && (
-                        <button
-                          onClick={() => handleCreateLink(fatura.id)}
-                          title="Gerar Link Stripe"
-                          className="p-2 bg-brand-primary/10 text-brand-primary hover:bg-brand-primary hover:text-white rounded-lg transition-all"
-                        >
-                          <CreditCard size={16} />
-                        </button>
-                      )}
-                      <button
-                        title="Baixar PDF"
-                        className="p-2 bg-white/5 text-white/40 hover:text-white rounded-lg transition-all"
-                      >
-                        <Download size={16} />
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-        {filteredFaturas.length === 0 && (
-          <div className="p-12 text-center">
-            <p className="text-white/20 text-sm italic">Nenhuma fatura encontrada com estes filtros.</p>
-          </div>
-        )}
-      </div>
-    </>
-  );
-}
-
-
+// Removed misplaced dummy block and function to restore parser correctness
 
 const IAModule = ({ data }: { data: any[] }) => (
   <div className="grid gap-4">
