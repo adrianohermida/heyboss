@@ -16,7 +16,7 @@ import { CustomForm } from '../components/CustomForm';
 import { contactFormTheme } from '../components/CustomForm/themes';
 import allConfigs from '../../shared/form-configs.json';
 import { useAuth } from '@hey-boss/users-service/react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 
 const AppointmentsPage: React.FC = () => {
   const { user, loading: authLoading } = useAuth();
@@ -134,9 +134,9 @@ const AppointmentsPage: React.FC = () => {
           {!user && !authLoading ? (
             <div className="bg-brand-dark/90 backdrop-blur-md rounded-2xl flex flex-col items-center justify-center p-8 text-center border-2 border-brand-primary shadow-2xl animate-fade-in mb-6">
               <p className="text-white/70 mb-8 max-w-xs text-base">Para agendar, crie uma conta gratuita ou faça login. Seus dados estarão protegidos e o atendimento é sigiloso.</p>
-              <a href="/register" className="w-full bg-brand-primary hover:bg-brand-primary/90 text-white px-8 py-4 rounded-xl font-bold text-lg transition-all shadow-xl shadow-brand-primary/20 focus:outline-none focus:ring-2 focus:ring-brand-primary focus:ring-offset-2 mb-2">Criar Conta Gratuita</a>
-              <a href="/login" className="w-full bg-white/5 hover:bg-white/10 text-brand-primary border border-brand-primary px-8 py-4 rounded-xl font-bold text-lg transition-all focus:outline-none focus:ring-2 focus:ring-brand-primary focus:ring-offset-2 mb-2">Já tenho conta – Entrar</a>
-              <a href="/forgot-password" className="w-full text-xs text-white/50 hover:text-brand-primary underline mt-2 transition-all">Esqueci minha senha</a>
+              <Link to="/register" className="w-full bg-brand-primary hover:bg-brand-primary/90 text-white px-8 py-4 rounded-xl font-bold text-lg transition-all shadow-xl shadow-brand-primary/20 focus:outline-none focus:ring-2 focus:ring-brand-primary focus:ring-offset-2 mb-2 block text-center">Criar Conta Gratuita</Link>
+              <Link to="/login" className="w-full bg-white/5 hover:bg-white/10 text-brand-primary border border-brand-primary px-8 py-4 rounded-xl font-bold text-lg transition-all focus:outline-none focus:ring-2 focus:ring-brand-primary focus:ring-offset-2 mb-2 block text-center">Já tenho conta – Entrar</Link>
+              <Link to="/forgot-password" className="w-full text-xs text-white/50 hover:text-brand-primary underline mt-2 transition-all block text-center">Esqueci minha senha</Link>
               <p className="text-white/30 text-xs mt-6">Ao criar uma conta, você concorda com nossos Termos de Uso e Política de Privacidade.</p>
             </div>
           ) : step === 0 ? (
