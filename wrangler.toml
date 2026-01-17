@@ -19,7 +19,7 @@ binding = "KV"
 id = "2b435d2d0966473a9fcdf8aed30d6f67"
 
 [env.production]
-vars = { ENVIRONMENT = "production", PROJECT_ID = "prod_project_id", USER_EMAIL = "adrianohermida@gmail.com", API_KEY = "prod_api_key", ADMIN_EMAILS = "contato@hermidamaia.adv.br,adrianohermida@gmail.com,admin@example.com", STRIPE_SECRET_KEY = "sk_live_placeholder", STRIPE_CONNECT_ACCOUNT_ID = "stripe_account_id" }
+vars = { ENVIRONMENT = "production", PROJECT_ID = "prod_project_id", USER_EMAIL = "adrianohermida@gmail.com", API_KEY = "prod_api_key", ADMIN_EMAILS = "contato@hermidamaia.adv.br,adrianohermida@gmail.com,adriano@hermidamaia.adv.br" }
 
 [[env.production.routes]]
 pattern = "api.hermidamaia.adv.br/*"
@@ -35,7 +35,7 @@ binding = "KV"
 id = "2b435d2d0966473a9fcdf8aed30d6f67"
 
 [env.staging]
-vars = { ENVIRONMENT = "staging", PROJECT_ID = "staging_project_id", USER_EMAIL = "adrianohermida@gmail.com", API_KEY = "staging_api_key", ADMIN_EMAILS = "contato@hermidamaia.adv.br,adrianohermida@gmail.com,admin@example.com", STRIPE_SECRET_KEY = "sk_test_placeholder", STRIPE_CONNECT_ACCOUNT_ID = "stripe_account_id" }
+vars = { ENVIRONMENT = "staging", PROJECT_ID = "staging_project_id", USER_EMAIL = "adrianohermida@gmail.com", API_KEY = "staging_api_key", ADMIN_EMAILS = "contato@hermidamaia.adv.br,adrianohermida@gmail.com,adriano@hermidamaia.adv.br" }
 
 [[env.staging.routes]]
 pattern = "api-staging.heyboss.com.br/*"
@@ -52,7 +52,7 @@ binding = "KV"
 id = "2b435d2d0966473a9fcdf8aed30d6f67"
 
 [env.development]
-vars = { ENVIRONMENT = "development", PROJECT_ID = "project_id", USER_EMAIL = "adrianohermida@gmail.com", API_KEY = "api_key", ADMIN_EMAILS = "contato@hermidamaia.adv.br,adrianohermida@gmail.com,admin@example.com", STRIPE_SECRET_KEY = "sk_test_placeholder", STRIPE_CONNECT_ACCOUNT_ID = "stripe_account_id" }
+vars = { ENVIRONMENT = "development", PROJECT_ID = "project_id", USER_EMAIL = "adrianohermida@gmail.com", API_KEY = "api_key", ADMIN_EMAILS = "contato@hermidamaia.adv.br,adrianohermida@gmail.com,adriano@hermidamaia.adv.br" }
 
 [[env.development.d1_databases]]
 binding = "heyboss_db"
