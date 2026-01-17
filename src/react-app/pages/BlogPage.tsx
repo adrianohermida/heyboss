@@ -18,6 +18,8 @@ import {
   Loader2,
   Filter
 } from 'lucide-react';
+import Footer from '../components/Footer';
+import ScrollToTopButton from '../components/ScrollToTopButton';
 import Header from '../components/Header';
 
 const BlogPage = () => {
@@ -182,6 +184,14 @@ const BlogPage = () => {
   );
 };
 
-export default BlogPage;
+export default function BlogPageWrapper() {
+  return (
+    <>
+      <BlogPage />
+      <Footer />
+      <ScrollToTopButton />
+    </>
+  );
+}
 
 
