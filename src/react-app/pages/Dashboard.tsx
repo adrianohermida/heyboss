@@ -48,6 +48,7 @@ const Dashboard: React.FC = () => {
                 {activeTab === 'faturas' && <FaturasModule data={filteredData} />}
                 {activeTab === 'tickets' && <TicketsModule data={filteredData} />}
                 {activeTab === 'overview' && <OverviewModule />}
+                {activeTab === 'config' && <ConfigModule />}
                 {/* Adicione outros módulos conforme modularização */}
               </div>
             )}
