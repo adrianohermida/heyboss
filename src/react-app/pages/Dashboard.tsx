@@ -1,9 +1,3 @@
-// Forward declarations to fix hoisting issues for JSX usage
-const FaturasModule: React.FC<{ data: any[] }> = () => null;
-const TicketsModule: React.FC<{ data: any[] }> = () => null;
-const IAModule: React.FC<{ data: any[] }> = () => null;
-const AdminAgendaModule: React.FC = () => null;
-const ConfigModule: React.FC<{ status: any; onUpdate: (configType: string, value: any) => Promise<void>; }> = () => null;
 /**
  * @description Painel Administrativo completo para Hermida Maia Advocacia.
  *             Gerencia Leads, Processos, Faturas, Tickets, Publicações e IA.
@@ -53,205 +47,6 @@ import { PublicacoesModule } from '../components/Publicacoes/PublicacoesModule';
 
 
 const clsx = (...classes: any[]) => classes.filter(Boolean).join(' ');
-
-const Dashboard = () => {
-  const { user, isPending } = useAuth();
-  const navigate = useNavigate();
-  const [searchParams] = useSearchParams();
-  const [activeTab, setActiveTab] = useState<'leads' | 'processos' | 'faturas' | 'tickets' | 'publicacoes' | 'ai' | 'balcao' | 'chatbot' | 'blog' | 'config' | 'agenda'>('leads');
-  const [loading, setLoading] = useState(false);
-  const [data, setData] = useState<any[]>([]);
-  const [searchTerm, setSearchTerm] = useState('');
-  const [integrationsStatus, setIntegrationsStatus] = useState<any>(null);
-  const [appointments, setAppointments] = useState<any[]>([]);
-  const [loadingAppointments, setLoadingAppointments] = useState(false);
-
-  // Admin-only access check
-  useEffect(() => {
-    if (!isPending && user && !user.isAdmin) {
-      navigate('/portal', { replace: true });
-    }
-  }, [user, isPending, navigate]);
-
-  // Handle success messages from OAuth redirects
-  useEffect(() => {
-    if (searchParams.get('google') === 'success') {
-      console.log('Google Calendar connected successfully');
-    }
-  }, [searchParams]);
-
-  // Fetch data based on active tab
-  useEffect(() => {
-    
-    const fetchData = async () => {
-      setLoading(true);
-      try {
-        let endpoint = '';
-        if (activeTab === 'leads') endpoint = '/api/admin/leads';
-        else if (activeTab === 'processos') endpoint = '/api/admin/processos';
-        else if (activeTab === 'faturas') endpoint = '/api/admin/faturas';
-        else if (activeTab === 'tickets') endpoint = '/api/tickets'; // Admin sees all via backend logic
-        else if (activeTab === 'publicacoes') endpoint = '/api/admin/publicacoes';
-        else if (activeTab === 'ai') endpoint = '/api/admin/ai-interactions';
-        else if (activeTab === 'config') endpoint = '/api/admin/integrations/status';
-
-        if (endpoint) {
-          const res = await fetch(endpoint);
-          const result = await res.json();
-          if (activeTab === 'config') setIntegrationsStatus(result);
-          else setData(Array.isArray(result) ? result : []);
-        }
-      } catch (err) {
-        console.error(`Error fetching ${activeTab}:`, err);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchData();
-  }, [activeTab]);
-
-  useEffect(() => {
-    if (activeTab === 'agenda') {
-      setLoadingAppointments(true);
-      fetch('/api/admin/appointments')
-        .then(res => res.json())
-        .then(data => {
-          setAppointments(data);
-          setLoadingAppointments(false);
-        });
-    }
-  }, [activeTab]);
-
-  const filteredData = useMemo(() => {
-    if (!searchTerm) return data;
-    return data.filter(item => 
-      Object.values(item).some(val => 
-        String(val).toLowerCase().includes(searchTerm.toLowerCase())
-      )
-    );
-  }, [data, searchTerm]);
-
-  const handleExport = async () => {
-    if (activeTab === 'leads') {
-      window.open('/api/admin/leads/export', '_blank');
-    } else {
-      alert('Exportação para este módulo em breve.');
-    }
-  };
-
-  const handleConfigUpdate = async (configType: string, value: any) => {
-    try {
-      const res = await fetch('/api/admin/config/update', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ configType, value })
-      });
-      if (res.ok) {
-        alert('Configuração atualizada com sucesso!');
-      } else {
-        alert('Erro ao atualizar configuração.');
-      }
-    } catch (error) {
-      console.error('Erro:', error);
-      alert('Erro ao salvar configuração.');
-    }
-  };
-
-  return (
-    <div className="min-h-screen bg-brand-dark text-white">
-      <Header />
-      <main className="pt-32 pb-20 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
-        <div className="flex flex-col lg:flex-row gap-8">
-          {/* Sidebar */}
-          <aside className="w-full lg:w-64 shrink-0">
-            <nav className="space-y-1">
-              {
-                [
-                  { id: 'leads', label: 'CRM / Leads', icon: Users },
-                  { id: 'processos', label: 'Processos', icon: Scale },
-                  { id: 'faturas', label: 'Financeiro', icon: CreditCard },
-                  { id: 'tickets', label: 'Helpdesk', icon: MessageSquare },
-                  { id: 'publicacoes', label: 'Publicações', icon: FileText },
-                  { id: 'ai', label: 'IA Monitorada', icon: Bot },
-                  { id: 'chatbot', label: 'Chatbot IA', icon: Settings },
-                  { id: 'balcao', label: 'Balcão Virtual', icon: MessageSquare },
-                  { id: 'agenda', label: 'Agenda', icon: Calendar },
-                  { id: 'config', label: 'Configurações', icon: Settings },
-                ].map((item) => (
-                  <button
-                    key={item.id}
-                    onClick={() => setActiveTab(item.id as any)}
-                    className={clsx(
-                      "w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-bold transition-all group",
-                      activeTab === item.id 
-                        ? "bg-brand-primary text-white shadow-lg shadow-brand-primary/20" 
-                        : "text-white/40 hover:text-white hover:bg-white/5"
-                    )}
-                  >
-                    <item.icon size={20} className={clsx(
-                      "transition-colors",
-                      activeTab === item.id ? "text-white" : "text-white/20 group-hover:text-white/60"
-                    )} />
-                    {item.label}
-                  </button>
-                ))}
-            </nav>
-          </aside>
-
-          {/* Content */}
-          <div className="flex-1 min-w-0 space-y-6">
-            {/* Header Actions */}
-            {activeTab !== 'config' && (
-              <div className="flex flex-col sm:flex-row gap-4 items-center justify-between bg-brand-elevated p-4 rounded-2xl border border-white/5">
-                <div className="relative w-full sm:w-96">
-                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-white/20" size={18} />
-                  <input
-                    type="text"
-                    placeholder="Buscar..."
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                    className="w-full bg-brand-dark border border-white/10 rounded-xl py-2 pl-10 pr-4 text-sm outline-none focus:border-brand-primary transition-all"
-                  />
-                </div>
-                <div className="flex gap-2 w-full sm:w-auto">
-                  <button onClick={handleExport} className="flex-1 sm:flex-none flex items-center justify-center gap-2 bg-white/5 hover:bg-white/10 px-4 py-2 rounded-xl text-sm font-bold border border-white/10 transition-all">
-                    <Download size={18} />
-                    Exportar
-                  </button>
-                  <button className="flex-1 sm:flex-none flex items-center justify-center gap-2 bg-brand-primary hover:bg-brand-primary/90 px-4 py-2 rounded-xl text-sm font-bold transition-all shadow-lg shadow-brand-primary/20">
-                    <Plus size={18} />
-                    Novo
-                  </button>
-                </div>
-              </div>
-            )}
-
-            {/* Tab Content */}
-            {loading ? (
-              <div className="flex justify-center py-20">
-                <Loader2 className="animate-spin text-brand-primary" size={40} />
-              </div>
-            ) : (
-              <div className="animate-fade-in">
-                {activeTab === 'leads' && <CRMModule data={filteredData} />}
-                {activeTab === 'processos' && <ProcessosModule data={filteredData} />}
-                {activeTab === 'faturas' && <FaturasModule data={filteredData} />}
-                {activeTab === 'tickets' && <TicketsModule data={filteredData} />}
-                {activeTab === 'publicacoes' && <PublicacoesModule />}
-                {activeTab === 'ai' && <IAModule data={filteredData} />}
-                {activeTab === 'chatbot' && <ChatbotConfigModule />}
-                {activeTab === 'balcao' && <BalcaoVirtualModule />}
-                {activeTab === 'agenda' && <AdminAgendaModule />}
-                {activeTab === 'config' && <ConfigModule status={integrationsStatus} onUpdate={handleConfigUpdate} />}
-              </div>
-            )}
-          </div>
-        </div>
-      </main>
-    </div>
-  );
-};
 
 const OverviewModule = () => (
   <div className="space-y-8">
@@ -382,7 +177,8 @@ const ProcessosModule = ({ data }: { data: any[] }) => {
       </div>
     ))}
   </div>
-);
+  );
+};
 
 const FaturasModule = ({ data }: { data: any[] }) => {
   const [statusFilter, setStatusFilter] = useState('all');
@@ -1054,5 +850,204 @@ const ConfigModule = () => {
   );
 };
 
-export default Dashboard;
 
+const Dashboard = () => {
+  const { user, isPending } = useAuth();
+  const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const [activeTab, setActiveTab] = useState<'leads' | 'processos' | 'faturas' | 'tickets' | 'publicacoes' | 'ai' | 'balcao' | 'chatbot' | 'blog' | 'config' | 'agenda'>('leads');
+  const [loading, setLoading] = useState(false);
+  const [data, setData] = useState<any[]>([]);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [integrationsStatus, setIntegrationsStatus] = useState<any>(null);
+  const [appointments, setAppointments] = useState<any[]>([]);
+  const [loadingAppointments, setLoadingAppointments] = useState(false);
+
+  // Admin-only access check
+  useEffect(() => {
+    if (!isPending && user && !user.isAdmin) {
+      navigate('/portal', { replace: true });
+    }
+  }, [user, isPending, navigate]);
+
+  // Handle success messages from OAuth redirects
+  useEffect(() => {
+    if (searchParams.get('google') === 'success') {
+      console.log('Google Calendar connected successfully');
+    }
+  }, [searchParams]);
+
+  // Fetch data based on active tab
+  useEffect(() => {
+    
+    const fetchData = async () => {
+      setLoading(true);
+      try {
+        let endpoint = '';
+        if (activeTab === 'leads') endpoint = '/api/admin/leads';
+        else if (activeTab === 'processos') endpoint = '/api/admin/processos';
+        else if (activeTab === 'faturas') endpoint = '/api/admin/faturas';
+        else if (activeTab === 'tickets') endpoint = '/api/tickets'; // Admin sees all via backend logic
+        else if (activeTab === 'publicacoes') endpoint = '/api/admin/publicacoes';
+        else if (activeTab === 'ai') endpoint = '/api/admin/ai-interactions';
+        else if (activeTab === 'config') endpoint = '/api/admin/integrations/status';
+
+        if (endpoint) {
+          const res = await fetch(endpoint);
+          const result = await res.json();
+          if (activeTab === 'config') setIntegrationsStatus(result);
+          else setData(Array.isArray(result) ? result : []);
+        }
+      } catch (err) {
+        console.error(`Error fetching ${activeTab}:`, err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
+  }, [activeTab]);
+
+  useEffect(() => {
+    if (activeTab === 'agenda') {
+      setLoadingAppointments(true);
+      fetch('/api/admin/appointments')
+        .then(res => res.json())
+        .then(data => {
+          setAppointments(data);
+          setLoadingAppointments(false);
+        });
+    }
+  }, [activeTab]);
+
+  const filteredData = useMemo(() => {
+    if (!searchTerm) return data;
+    return data.filter(item => 
+      Object.values(item).some(val => 
+        String(val).toLowerCase().includes(searchTerm.toLowerCase())
+      )
+    );
+  }, [data, searchTerm]);
+
+  const handleExport = async () => {
+    if (activeTab === 'leads') {
+      window.open('/api/admin/leads/export', '_blank');
+    } else {
+      alert('Exportação para este módulo em breve.');
+    }
+  };
+
+  const handleConfigUpdate = async (configType: string, value: any) => {
+    try {
+      const res = await fetch('/api/admin/config/update', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ configType, value })
+      });
+      if (res.ok) {
+        alert('Configuração atualizada com sucesso!');
+      } else {
+        alert('Erro ao atualizar configuração.');
+      }
+    } catch (error) {
+      console.error('Erro:', error);
+      alert('Erro ao salvar configuração.');
+    }
+  };
+
+  return (
+    <div className="min-h-screen bg-brand-dark text-white">
+      <Header />
+      <main className="pt-32 pb-20 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
+        <div className="flex flex-col lg:flex-row gap-8">
+          {/* Sidebar */}
+          <aside className="w-full lg:w-64 shrink-0">
+            <nav className="space-y-1">
+              {
+                [
+                  { id: 'leads', label: 'CRM / Leads', icon: Users },
+                  { id: 'processos', label: 'Processos', icon: Scale },
+                  { id: 'faturas', label: 'Financeiro', icon: CreditCard },
+                  { id: 'tickets', label: 'Helpdesk', icon: MessageSquare },
+                  { id: 'publicacoes', label: 'Publicações', icon: FileText },
+                  { id: 'ai', label: 'IA Monitorada', icon: Bot },
+                  { id: 'chatbot', label: 'Chatbot IA', icon: Settings },
+                  { id: 'balcao', label: 'Balcão Virtual', icon: MessageSquare },
+                  { id: 'agenda', label: 'Agenda', icon: Calendar },
+                  { id: 'config', label: 'Configurações', icon: Settings },
+                ].map((item) => (
+                  <button
+                    key={item.id}
+                    onClick={() => setActiveTab(item.id as any)}
+                    className={clsx(
+                      "w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-bold transition-all group",
+                      activeTab === item.id 
+                        ? "bg-brand-primary text-white shadow-lg shadow-brand-primary/20" 
+                        : "text-white/40 hover:text-white hover:bg-white/5"
+                    )}
+                  >
+                    <item.icon size={20} className={clsx(
+                      "transition-colors",
+                      activeTab === item.id ? "text-white" : "text-white/20 group-hover:text-white/60"
+                    )} />
+                    {item.label}
+                  </button>
+                ))}
+            </nav>
+          </aside>
+
+          {/* Content */}
+          <div className="flex-1 min-w-0 space-y-6">
+            {/* Header Actions */}
+            {activeTab !== 'config' && (
+              <div className="flex flex-col sm:flex-row gap-4 items-center justify-between bg-brand-elevated p-4 rounded-2xl border border-white/5">
+                <div className="relative w-full sm:w-96">
+                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-white/20" size={18} />
+                  <input
+                    type="text"
+                    placeholder="Buscar..."
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    className="w-full bg-brand-dark border border-white/10 rounded-xl py-2 pl-10 pr-4 text-sm outline-none focus:border-brand-primary transition-all"
+                  />
+                </div>
+                <div className="flex gap-2 w-full sm:w-auto">
+                  <button onClick={handleExport} className="flex-1 sm:flex-none flex items-center justify-center gap-2 bg-white/5 hover:bg-white/10 px-4 py-2 rounded-xl text-sm font-bold border border-white/10 transition-all">
+                    <Download size={18} />
+                    Exportar
+                  </button>
+                  <button className="flex-1 sm:flex-none flex items-center justify-center gap-2 bg-brand-primary hover:bg-brand-primary/90 px-4 py-2 rounded-xl text-sm font-bold transition-all shadow-lg shadow-brand-primary/20">
+                    <Plus size={18} />
+                    Novo
+                  </button>
+                </div>
+              </div>
+            )}
+
+            {/* Tab Content */}
+            {loading ? (
+              <div className="flex justify-center py-20">
+                <Loader2 className="animate-spin text-brand-primary" size={40} />
+              </div>
+            ) : (
+              <div className="animate-fade-in">
+                {activeTab === 'leads' && <CRMModule data={filteredData} />}
+                {activeTab === 'processos' && <ProcessosModule data={filteredData} />}
+                {activeTab === 'faturas' && <FaturasModule data={filteredData} />}
+                {activeTab === 'tickets' && <TicketsModule data={filteredData} />}
+                {activeTab === 'publicacoes' && <PublicacoesModule />}
+                {activeTab === 'ai' && <IAModule data={filteredData} />}
+                {activeTab === 'chatbot' && <ChatbotConfigModule />}
+                {activeTab === 'balcao' && <BalcaoVirtualModule />}
+                {activeTab === 'agenda' && <AdminAgendaModule />}
+                {activeTab === 'config' && <ConfigModule status={integrationsStatus} onUpdate={handleConfigUpdate} />}
+              </div>
+            )}
+          </div>
+        </div>
+      </main>
+    </div>
+  );
+};
+
+export default Dashboard;
