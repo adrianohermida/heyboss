@@ -42,14 +42,14 @@ import { useTheme } from '../../styles/ThemeProvider';
 const Hero = () => {
   const { mode } = useTheme();
   const bg = mode === 'clear' ? 'bg-white' : 'bg-brand-dark';
-  const text = mode === 'clear' ? 'text-brand-dark' : 'text-white';
+  const text = mode === 'clear' ? 'text-gray-900' : 'text-white';
   return (
     <section className={`relative pt-32 pb-20 lg:pt-48 lg:pb-32 overflow-hidden ${bg}`}>
     <div className="absolute top-0 left-0 w-full h-full bg-[radial-gradient(circle_at_30%_30%,#0d9c6e15_0%,transparent_50%)]" />
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
       <div className="grid lg:grid-cols-2 gap-12 items-center">
         <div className="text-center lg:text-left space-y-8 animate-fade-in">
-          <div className="inline-flex items-center gap-2 bg-brand-accent/10 border border-brand-accent/20 px-4 py-2 rounded-full">
+          <div className={`inline-flex items-center gap-2 px-4 py-2 rounded-full ${mode === 'clear' ? 'bg-gray-100 border border-gray-200' : 'bg-brand-accent/10 border border-brand-accent/20'}`}> 
             <span className="w-2 h-2 bg-brand-accent rounded-full animate-pulse" />
             <span className="text-brand-accent text-xs font-bold uppercase tracking-widest">Lei 14.181/2021 - Superendividamento</span>
           </div>
@@ -57,19 +57,21 @@ const Hero = () => {
           <h1 className={`text-4xl sm:text-5xl lg:text-6xl font-extrabold ${text} leading-[1.1] sm:!text-[53px]`}>
             Advogado Especialista em Superendividamento: Parcele suas <span className="text-brand-primary">dívidas</span> em até 5 anos
           </h1>
-          <p className={`text-lg ${mode === 'clear' ? 'text-brand-dark/70' : 'text-white/70'} max-w-xl mx-auto lg:mx-0 leading-relaxed`}>
+          <p className={`text-lg ${mode === 'clear' ? 'text-gray-700' : 'text-white/70'} max-w-xl mx-auto lg:mx-0 leading-relaxed`}>
             Advocacia especializada em superendividamento e defesa do consumidor. Mais de R$ 35 milhões em redução de dívidas renegociados em todo o Brasil. Recupere sua paz financeira hoje.
           </p>
           
           <div className="flex flex-col sm:flex-row items-center gap-4 justify-center lg:justify-start">
             <button 
               onClick={() => document.getElementById('calculadora')?.scrollIntoView({ behavior: 'smooth' })}
-              className="w-full sm:w-auto bg-brand-primary hover:bg-brand-primary/90 text-white px-8 py-4 rounded-xl font-bold text-lg flex items-center justify-center gap-3 transition-all hover:scale-105 shadow-xl shadow-brand-primary/20 group"
+              className={`w-full sm:w-auto font-bold text-lg flex items-center justify-center gap-3 transition-all rounded-xl px-8 py-4 group
+                ${mode === 'clear' ? 'bg-brand-primary text-white hover:bg-brand-primary/90 shadow-md border border-brand-primary/80' : 'bg-brand-primary hover:bg-brand-primary/90 text-white shadow-xl shadow-brand-primary/20 border-none'}`}
             >
               Calcular Gratuitamente
               <ArrowRight size={20} className="group-hover:translate-x-1 transition-transform" />
             </button>
-            <Link to="/appointments" className="hidden sm:flex w-full sm:w-auto bg-white/5 hover:bg-white/10 text-white border border-white/10 px-8 py-4 rounded-xl font-bold text-lg transition-all items-center justify-center">
+            <Link to="/appointments" className={`hidden sm:flex w-full sm:w-auto font-bold text-lg transition-all items-center justify-center rounded-xl px-8 py-4
+              ${mode === 'clear' ? 'bg-white border border-gray-200 text-gray-900 hover:bg-gray-50 shadow' : 'bg-white/5 hover:bg-white/10 text-white border border-white/10'}`}> 
               Agendar Consulta
             </Link>
           </div>
@@ -136,7 +138,7 @@ const Hero = () => {
 const Stats = () => {
   const { mode } = useTheme();
   const bg = mode === 'clear' ? 'bg-gray-50' : 'bg-brand-secondary';
-  const text = mode === 'clear' ? 'text-brand-dark' : 'text-white';
+  const text = mode === 'clear' ? 'text-gray-900' : 'text-white';
   return (
     <section className={`py-20 ${bg}`}>
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -152,12 +154,12 @@ const Stats = () => {
           { icon: Zap, title: "Solução Rápida", desc: "Processos otimizados para eliminar dívidas de forma definitiva e ágil." },
           { icon: Smile, title: "Tranquilidade", desc: "Recupere sua dignidade financeira com nossa consultoria jurídica especializada." }
         ].map((stat, idx) => (
-          <div key={idx} className="bg-brand-elevated p-8 rounded-2xl border border-white/5 hover:border-brand-primary/30 transition-all group">
-            <div className="bg-brand-primary/10 w-14 h-14 rounded-xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+          <div key={idx} className={`p-8 rounded-2xl transition-all group shadow ${mode === 'clear' ? 'bg-white border border-gray-200 hover:border-brand-primary/30' : 'bg-brand-elevated border border-white/5 hover:border-brand-primary/30'}`}>
+            <div className={`w-14 h-14 rounded-xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform ${mode === 'clear' ? 'bg-gray-100' : 'bg-brand-primary/10'}`}>
               <stat.icon className="text-brand-primary" size={28} />
             </div>
-            <h3 className="text-xl font-bold text-white mb-3">{stat.title}</h3>
-            <p className="text-white/50 text-sm leading-relaxed">{stat.desc}</p>
+            <h3 className={`text-xl font-bold mb-3 ${text}`}>{stat.title}</h3>
+            <p className={`${mode === 'clear' ? 'text-gray-700' : 'text-white/50'} text-sm leading-relaxed`}>{stat.desc}</p>
           </div>
         ))}
       </div>
@@ -238,7 +240,7 @@ const Calculator = () => {
     <section id="calculadora" className={`py-24 ${bg} relative overflow-hidden`}>
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-brand-primary/5 rounded-full blur-[120px] pointer-events-none" />
       <div className="max-w-4xl mx-auto px-4 relative z-10">
-        <div className={`rounded-[2.5rem] p-8 sm:p-12 border shadow-2xl ${mode === 'clear' ? 'bg-white border-gray-200' : 'bg-brand-elevated border-white/10'}`}>
+        <div className={`rounded-[2.5rem] p-8 sm:p-12 shadow ${mode === 'clear' ? 'bg-white border border-gray-200' : 'bg-brand-elevated border border-white/10'}`}>
           <div className="text-center mb-12">
             <h2 className="text-3xl sm:text-4xl font-extrabold text-white mb-4">Calculadora de Superendividamento: Veja como Eliminar Dívidas</h2>
             <p className="text-white/60">Descubra em minutos se você tem direito à Lei 14.181/2021 para renegociar dívidas até 70% e sair do sufoco financeiro.</p>
