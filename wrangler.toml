@@ -2,6 +2,9 @@ name = "heyboss-ai"
 main = "./src/worker/index.ts"
 compatibility_date = "2025-04-01"
 compatibility_flags = ["nodejs_compat"]
+# Replace with your Cloudflare Account ID from the Workers & Pages section
+# This value should match the CLOUDFLARE_ACCOUNT_ID secret in GitHub Actions
+account_id = "YOUR_CLOUDFLARE_ACCOUNT_ID"
 
 [observability]
 enabled = true
