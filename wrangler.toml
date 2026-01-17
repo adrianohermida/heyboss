@@ -2,14 +2,21 @@ name = "heyboss-ai"
 main = "./src/worker/index.ts"
 compatibility_date = "2025-04-01"
 compatibility_flags = ["nodejs_compat"]
-# Replace with your Cloudflare Account ID from the Workers & Pages section
-# This value should match the CLOUDFLARE_ACCOUNT_ID secret in GitHub Actions
-account_id = "YOUR_CLOUDFLARE_ACCOUNT_ID"
 
 [observability]
 enabled = true
 
 upload_source_maps = true
+
+[[d1_databases]]
+binding = "heyboss_db"
+database_name = "heyboss_db"
+database_id = "223d8197-7c2d-47ab-8b63-4adb9c2998c2"
+remote = true
+
+[[kv_namespaces]]
+binding = "KV"
+id = "2b435d2d0966473a9fcdf8aed30d6f67"
 
 [env.production]
 vars = { ENVIRONMENT = "production", PROJECT_ID = "prod_project_id", USER_EMAIL = "adrianohermida@gmail.com", API_KEY = "prod_api_key", ADMIN_EMAILS = "contato@hermidamaia.adv.br,adrianohermida@gmail.com,admin@example.com", STRIPE_SECRET_KEY = "sk_live_placeholder", STRIPE_CONNECT_ACCOUNT_ID = "stripe_account_id" }
@@ -38,6 +45,7 @@ zone_name = "heyboss.com.br"
 binding = "heyboss_db"
 database_name = "heyboss_db"
 database_id = "223d8197-7c2d-47ab-8b63-4adb9c2998c2"
+remote = true
 
 [[env.staging.kv_namespaces]]
 binding = "KV"
@@ -50,6 +58,7 @@ vars = { ENVIRONMENT = "development", PROJECT_ID = "project_id", USER_EMAIL = "a
 binding = "heyboss_db"
 database_name = "heyboss_db"
 database_id = "223d8197-7c2d-47ab-8b63-4adb9c2998c2"
+remote = true
 
 [[env.development.kv_namespaces]]
 binding = "KV"
