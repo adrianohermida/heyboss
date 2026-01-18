@@ -26,7 +26,7 @@ jobs:
         run: npm ci
 
       - name: Build Worker
-        run: npm run build:worker
+        run: NODE_OPTIONS=--experimental-vm-modules npm run build:worker
 
       - name: Deploy to Cloudflare Workers
         if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master'
