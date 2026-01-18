@@ -16,7 +16,7 @@ export const colors = {
     accent: '#f59e0b',
     text: '#fff',
     card: '#181c2a',
-    border: '#22242c',
+    border: '#23283a',
   }
 };
 

@@ -23,7 +23,12 @@ export default {
         },
         border: {
           DEFAULT: 'var(--color-border)',
-        }
+        },
+        bg: {
+          DEFAULT: 'var(--color-bg)',
+          dark: 'var(--color-bg-dark)',
+          clear: 'var(--color-bg-clear)',
+        },
       },
       fontFamily: {
         sans: ['Inter', 'sans-serif'],
