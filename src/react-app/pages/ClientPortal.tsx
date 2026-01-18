@@ -487,6 +487,12 @@ useEffect(() => {
                 )}
               </div>
             )}
+            {activeTab === 'tickets' && <TicketsModule />}
+            {/* ...outros módulos... */}
+          </div>
+        </div>
+      </main>
+    </div>
   // Fetch appointments from Supabase
   const fetchAppointments = async () => {
     setLoadingAppointments(true);
@@ -513,11 +519,11 @@ useEffect(() => {
     fetchAppointments();
   }, [user]);
 
-            {activeTab === 'tickets' && <TicketsModule />}
-          </div>
-        </div>
-      </main>
-    </div>
+  // ...existing code...
+  return (
+    // ...existing code...
+  );
+}
   );
 };
 
