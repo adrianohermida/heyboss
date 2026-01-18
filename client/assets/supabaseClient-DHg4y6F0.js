@@ -1,1 +1,0 @@
-import{g as s}from"./index-BEQYqAOH.js";const I="https://muszevhspgoqaxbyzlly.supabase.co",a="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNzcHZpem9nYmN5aWdxdXF5Y3N6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njc3OTYxNTYsImV4cCI6MjA4MzM3MjE1Nn0.C1P4wlanONGA9EDNR4nBujJ136sSXlZCioFyd_CWIfs",i=s(I,a);export{i as s};
