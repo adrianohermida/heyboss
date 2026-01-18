@@ -1,6 +1,7 @@
 import React from 'react';
 import { AlertCircle, CheckCircle2, MessageCircle, Zap } from 'lucide-react';
 import { useTheme } from '../../../styles/ThemeProvider';
+import { supabase } from '../../supabaseClient';
 
 const Calculator: React.FC = () => {
   const { mode } = useTheme();
@@ -48,17 +49,11 @@ const Calculator: React.FC = () => {
       setResult(calculationResult);
       setIsSaving(true);
       try {
-        await fetch('/api/simulations', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            simulationData: {
-              ...formData,
-              ...calculationResult,
-              timestamp: new Date().toISOString()
-            }
-          })
-        });
+        await supabase.from('simulations').insert([{
+          ...formData,
+          ...calculationResult,
+          timestamp: new Date().toISOString()
+        }]);
       } catch (error) {
         // erro ao salvar simulação
       } finally {
