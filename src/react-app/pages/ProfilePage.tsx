@@ -32,7 +32,7 @@ const ProfilePage = () => {
   const isCliente = !isAdmin && !isColaborador;
 
   useEffect(() => {
-    fetch('/api/user/profile')
+    fetch('/api/usuarios_ext')
       .then(res => res.json())
       .then(data => {
         setProfile(data);
@@ -45,7 +45,7 @@ const ProfilePage = () => {
     setSaving(true);
     setMessage(null);
     try {
-      const res = await fetch('/api/user/profile', {
+      const res = await fetch('/api/usuarios_ext', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(formData)

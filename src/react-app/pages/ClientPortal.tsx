@@ -17,34 +17,16 @@ const ClientPortal: React.FC = () => {
   const [summary, setSummary] = useState({ processos: 0, faturas: 0, tickets: 0, appointments: 0 });
   const [exporting, setExporting] = useState(false);
 
-  const handleExportData = async () => {
-    setExporting(true);
-    try {
-      const res = await fetch('/api/users/personal-data');
-      if (res.ok) {
-        const data = await res.json();
-        const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
-        const url = window.URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = `meus_dados_hermida_maia.json`;
-        a.click();
-      }
-    } finally {
-      setExporting(false);
-    }
-  };
+  // Removido: handleExportData e exportação de dados via endpoint inexistente
 
-  useEffect(() => {
-    fetch('/api/users/summary').then(res => res.ok && res.json().then(setSummary));
-  }, []);
+  // Removido: fetch para /api/users/summary (endpoint inexistente)
 
   return (
     <div className="min-h-screen bg-brand-dark text-white selection:bg-brand-primary selection:text-white">
       <Header />
       <main className="pt-32 pb-20 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
         <div className="flex flex-col lg:flex-row gap-8">
-          <ClientPortalSidebar user={user} activeTab={activeTab} setActiveTab={setActiveTab} exporting={exporting} onExport={handleExportData} />
+          <ClientPortalSidebar user={user} activeTab={activeTab} setActiveTab={setActiveTab} exporting={false} onExport={undefined} />
           <div className="flex-1 min-w-0 space-y-8">
             {activeTab === 'overview' && <ClientPortalOverview user={user} summary={summary} setActiveTab={setActiveTab} />}
             {/* Outros módulos: processos, tickets, financeiro, documentos, plano, agenda */}
@@ -522,25 +504,7 @@ const TicketsModule = () => {
             </div>
           </div>
           
-          <button 
-            onClick={async () => {
-              const res = await fetch(`/api/users/personal-data`);
-              if (res.ok) {
-                const data = await res.json();
-                const ticketData = data.tickets.find(t => t.id === selectedTicket.id);
-                const blob = new Blob([JSON.stringify({ ticket: ticketData, messages }, null, 2)], { type: 'application/json' });
-                const url = window.URL.createObjectURL(blob);
-                const a = document.createElement('a');
-                a.href = url;
-                a.download = `ticket_${selectedTicket.id}_hermida_maia.json`;
-                a.click();
-              }
-            }}
-            className="p-2 bg-white/5 hover:bg-white/10 rounded-xl text-white/40 hover:text-white transition-all"
-            title="Exportar conversa"
-          >
-            <Download size={20} />
-          </button>
+            {/* Removido: exportação de conversa via endpoint inexistente */}
         </div>
 
         <div className="bg-brand-elevated rounded-[2.5rem] border border-white/5 flex flex-col h-[600px] overflow-hidden shadow-2xl relative">
