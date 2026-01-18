@@ -13,10 +13,14 @@
 	"env": {
 		"production": {
 			"routes": [
-				{
-					"pattern": "api.hermidamaia.adv.br/*",
-					"zone_name": "hermidamaia.adv.br"
-				}
+				   {
+					   "pattern": "api.hermidamaia.adv.br/*",
+					   "zone_name": "hermidamaia.adv.br"
+				   },
+				   {
+					   "pattern": "hermidamaia.adv.br/api/*",
+					   "zone_name": "hermidamaia.adv.br"
+				   }
 			],
 			"vars": {
 				"ENVIRONMENT": "production",
