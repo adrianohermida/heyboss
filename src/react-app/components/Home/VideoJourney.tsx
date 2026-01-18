@@ -19,6 +19,7 @@ const VideoJourney: React.FC = () => {
   const cardBg = mode === 'clear' ? 'bg-white border border-gray-200' : 'bg-brand-elevated border border-white/10';
 
   // Fix: Add state for currentStep and completed
+  // Trivial change to force redeploy and cache bust
   const [currentStep, setCurrentStep] = React.useState(0);
   const completed = currentStep >= videos.length;
 
