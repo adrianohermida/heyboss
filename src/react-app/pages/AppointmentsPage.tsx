@@ -15,7 +15,7 @@ import AppointmentsSuccess from '../components/Appointments/AppointmentsSuccess'
 import { CustomForm } from '../components/CustomForm';
 import { contactFormTheme } from '../components/CustomForm/themes';
 import allConfigs from '../../shared/form-configs.json';
-import { useAuth } from '@hey-boss/users-service/react';
+import { useAuth } from '../auth/supabaseAuth';
 import { useNavigate, Link } from 'react-router-dom';
 
 const AppointmentsPage: React.FC = () => {

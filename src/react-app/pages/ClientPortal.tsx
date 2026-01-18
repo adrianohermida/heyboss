@@ -7,7 +7,7 @@
 // - Responsivo, acessível, mobile-first, tokenização CSS
 import React, { useState, useEffect } from 'react';
 import Header from '../components/Header';
-import { useAuth } from '@hey-boss/users-service/react';
+import { useAuth } from '../auth/supabaseAuth';
 import ClientPortalSidebar from '../components/ClientPortal/ClientPortalSidebar';
 import ClientPortalOverview from '../components/ClientPortal/ClientPortalOverview';
 

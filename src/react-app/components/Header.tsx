@@ -10,7 +10,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { useTheme } from '../../styles/ThemeProvider';
 import { Link, useNavigate } from 'react-router-dom';
 import { User, LogOut, Briefcase, ChevronDown, LayoutDashboard, Menu, X, Shield, Settings } from 'lucide-react';
-import { useAuth } from '@hey-boss/users-service/react';
+import { useAuth } from '../auth/supabaseAuth';
 
 // Componente de logo adaptável
 export function LogoHM({ size = 48, rounded = true, bg = 'var(--color-brand)' }: { size?: number, rounded?: boolean, bg?: string }) {

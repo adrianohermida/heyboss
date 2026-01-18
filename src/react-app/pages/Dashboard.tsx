@@ -6,7 +6,7 @@
 // - Router: react-router-dom
 // - Mobile-first, acessível, tokenização CSS
 import React, { useState, useEffect, useMemo } from 'react';
-import { useAuth } from '@hey-boss/users-service/react';
+import { useAuth } from '../auth/supabaseAuth';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import Header from '../components/Header';
 import DashboardSidebar from '../components/Dashboard/DashboardSidebar';

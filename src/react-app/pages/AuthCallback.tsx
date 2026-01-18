@@ -31,7 +31,7 @@
 
 import React from "react";
 import { useEffect } from "react";
-import { useAuth } from "@hey-boss/users-service/react";
+import { useAuth } from "../auth/supabaseAuth";
 import { LoaderCircle } from "lucide-react";
 
 export function AuthCallback() {

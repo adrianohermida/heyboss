@@ -45,12 +45,12 @@
  */
 
 import React from "react";
-import { useAuth } from "@hey-boss/users-service/react";
+import { useAuth } from "../auth/supabaseAuth";
 import { Loader2 } from "lucide-react";
 import { Navigate, Outlet } from "react-router-dom";
 
 const AuthProtect = () => {
-  const { user, isPending } = useAuth();
+  const { user, loading: isPending } = useAuth();
 
   if (isPending) {
     return (

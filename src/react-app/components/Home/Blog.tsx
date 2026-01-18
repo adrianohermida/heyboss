@@ -9,7 +9,7 @@ const Blog: React.FC = () => {
   React.useEffect(() => {
     const fetchPosts = async () => {
       try {
-        const { data, error } = await import('../../supabaseClient').then(m => m.supabase)
+        const { data, error } = await import('../supabaseClient').then(m => m.supabase)
           .from('blog_posts')
           .select('*')
           .order('data_publicacao', { ascending: false });

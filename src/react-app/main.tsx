@@ -2,7 +2,7 @@
 import React from 'react'
 import ReactDOM from 'react-dom/client'
 import { BrowserRouter } from 'react-router-dom'
-import { AuthProvider } from '@hey-boss/users-service/react'
+import { AuthProvider } from './auth/supabaseAuth'
 import App from './App'
 import './index.css'
 import { ThemeProvider } from '../styles/ThemeProvider';
