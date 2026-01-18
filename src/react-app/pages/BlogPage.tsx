@@ -30,13 +30,14 @@ const BlogPage2: React.FC = () => {
     setLoading(true);
     const fetchData = async () => {
       let postsQuery = supabase
-        .from('blog_posts')
+        .from('blog')
         .select('*')
-        .order('data_publicacao', { ascending: false });
+        .order('published_at', { ascending: false });
       if (activeCategory) {
-        postsQuery = postsQuery.eq('categoria_id', activeCategory);
+        postsQuery = postsQuery.eq('category', activeCategory);
       }
       const { data: postsData, error: postsError } = await postsQuery;
+      // blog_categories remains unchanged
       const { data: catsData, error: catsError } = await supabase
         .from('blog_categories')
         .select('*')

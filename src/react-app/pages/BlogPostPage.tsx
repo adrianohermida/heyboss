@@ -37,7 +37,7 @@ const BlogPostPage = () => {
     const fetchPost = async () => {
       setLoading(true);
       const { data, error } = await supabase
-        .from('blog_posts')
+        .from('blog')
         .select('*')
         .eq('slug', slug)
         .single();
@@ -47,10 +47,10 @@ const BlogPostPage = () => {
         return;
       }
       setPost(data);
-      document.title = `${data.meta_titulo || data.titulo} | Blog Hermida Maia`;
+      document.title = `${data.title || data.slug} | Blog Hermida Maia`;
       // Atualizar meta tags dinamicamente (simulado para SPA)
       const metaDesc = document.querySelector('meta[name="description"]');
-      if (metaDesc) metaDesc.setAttribute('content', data.meta_descricao || data.resumo || '');
+      if (metaDesc) metaDesc.setAttribute('content', data.content?.slice(0, 160) || '');
       setLoading(false);
     };
     fetchPost();

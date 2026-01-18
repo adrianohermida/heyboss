@@ -11,9 +11,9 @@ const Blog: React.FC = () => {
     const fetchPosts = async () => {
       try {
         const { data, error } = await supabase
-          .from('blog_posts')
+          .from('blog')
           .select('*')
-          .order('data_publicacao', { ascending: false });
+          .order('published_at', { ascending: false });
         if (!error && Array.isArray(data)) {
           setPosts(data);
         }
