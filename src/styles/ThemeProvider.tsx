@@ -21,6 +21,8 @@ const ThemeContext = createContext<ThemeContextType>({
 });
 
 
+export const useTheme = () => useContext(ThemeContext);
+
 export const useThemeOverride = () => {
   const { setCustomColors } = useContext(ThemeContext);
   return setCustomColors;
