@@ -2,16 +2,18 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { colors, ThemeMode } from './theme';
 
+
+type ThemeColors = typeof colors.clear;
 type ThemeOverride = Partial<{
   mode: ThemeMode;
-  customColors: Partial<typeof colors.clear>;
+  customColors: Partial<ThemeColors>;
 }>;
 
 
 interface ThemeContextType {
   mode: ThemeMode;
   setMode: (mode: ThemeMode) => void;
-  setCustomColors: (colors: Partial<typeof colors.clear> | null) => void;
+  setCustomColors: (colors: Partial<ThemeColors> | null) => void;
 }
 
 const ThemeContext = createContext<ThemeContextType>({
@@ -31,14 +33,14 @@ export const useThemeOverride = () => {
 
 export const ThemeProvider: React.FC<{ children: React.ReactNode; override?: ThemeOverride }> = ({ children, override }) => {
   const [mode, setMode] = useState<ThemeMode>(override?.mode || 'clear');
-  const [customColors, setCustomColors] = useState<Partial<typeof colors.clear> | null>(override?.customColors || null);
+  const [customColors, setCustomColors] = useState<Partial<ThemeColors> | null>(override?.customColors || null);
 
   useEffect(() => {
     const root = document.documentElement;
     const baseColors = colors[mode];
     const themeColors = customColors ? { ...baseColors, ...customColors } : baseColors;
     Object.entries(themeColors).forEach(([key, value]) => {
-      root.style.setProperty(`--color-${key}`, value);
+      root.style.setProperty(`--color-${key}`, String(value));
     });
     root.style.setProperty('--color-bg', themeColors.bg);
     root.style.setProperty('--color-text', themeColors.text);
