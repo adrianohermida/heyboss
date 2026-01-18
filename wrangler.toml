@@ -1,6 +1,7 @@
 # Observability settings
+
 [observability]
-enabled = false
+enabled = true
 head_sampling_rate = 1
 
 [observability.logs]
@@ -13,14 +14,10 @@ invocation_logs = true
 enabled = true
 persist = true
 head_sampling_rate = 1
-name = "heyboss"
+
 main = "./src/worker/index.ts"
 compatibility_date = "2025-04-01"
 compatibility_flags = ["nodejs_compat"]
-
-[observability]
-enabled = true
-
 upload_source_maps = true
 
 [[d1_databases]]
