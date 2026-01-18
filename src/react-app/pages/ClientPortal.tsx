@@ -1,3 +1,6 @@
+import ClientPortalAgenda from '../components/ClientPortal/ClientPortalAgenda';
+import ClientPortalPlano from '../components/ClientPortal/ClientPortalPlano';
+import ClientPortalDocumentos from '../components/ClientPortal/ClientPortalDocumentos';
 import ClientPortalProcessos from '../components/ClientPortal/ClientPortalProcessos';
 import React, { useState, useEffect } from 'react';
 import { AlertCircle, Wallet, MessageSquare, ChevronRight, X, Calendar as CalendarIcon, Loader2, Scale, CheckCircle2, Clock, CreditCard, Download, Plus, FileText, ExternalLink } from 'lucide-react';
@@ -141,6 +144,9 @@ const ClientPortal: React.FC = () => {
             {/* Adicione aqui os módulos: processos, tickets, financeiro, documentos, plano, agenda, etc. */}
             {activeTab === 'financeiro' && <ClientPortalFaturas />}
             {activeTab === 'processos' && <ClientPortalProcessos />}
+            {activeTab === 'documentos' && <ClientPortalDocumentos />}
+            {activeTab === 'plano' && <ClientPortalPlano />}
+            {activeTab === 'agenda' && <ClientPortalAgenda />}
             {/* {activeTab === 'tickets' && <TicketsModule user={user} clienteId={clienteId} escritorioId={escritorioId} />} */}
           </div>
         </div>
