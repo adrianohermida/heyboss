@@ -8,6 +8,7 @@ import BlogSearchFilter from '../components/Blog/BlogSearchFilter';
 import BlogPostCard from '../components/Blog/BlogPostCard';
 import BlogSkeleton from '../components/Blog/BlogSkeleton';
 import BlogNoResults from '../components/Blog/BlogNoResults';
+import { supabase } from '../../supabaseClient';
 
 // Manifesto da página Blog
 // - Modular: cada seção é um componente
@@ -27,16 +28,24 @@ const BlogPage2: React.FC = () => {
     window.scrollTo(0, 0);
     document.title = 'Blog | Hermida Maia Advocacia';
     setLoading(true);
-    Promise.all([
-      fetch(`/api/blog${activeCategory ? `?categoria=${activeCategory}` : ''}`),
-      fetch('/api/admin/blog-categories')
-    ]).then(async ([postsRes, catsRes]) => {
-      const postsData = await postsRes.json();
-      const catsData = await catsRes.json();
-      if (Array.isArray(postsData)) setPosts(postsData);
-      if (Array.isArray(catsData)) setCategories(catsData);
+    const fetchData = async () => {
+      let postsQuery = supabase
+        .from('blog_posts')
+        .select('*')
+        .order('data_publicacao', { ascending: false });
+      if (activeCategory) {
+        postsQuery = postsQuery.eq('categoria_id', activeCategory);
+      }
+      const { data: postsData, error: postsError } = await postsQuery;
+      const { data: catsData, error: catsError } = await supabase
+        .from('blog_categories')
+        .select('*')
+        .order('nome', { ascending: true });
+      if (!postsError && Array.isArray(postsData)) setPosts(postsData);
+      if (!catsError && Array.isArray(catsData)) setCategories(catsData);
       setLoading(false);
-    });
+    };
+    fetchData();
   }, [activeCategory]);
 
   const filteredPosts = posts.filter(post =>

@@ -29,6 +29,7 @@ import { CustomForm } from '../CustomForm';
 import { contactFormTheme } from '../CustomForm/themes';
 import allConfigs from '../../../shared/form-configs.json';
 import { BlogEditor } from './BlogEditor';
+import { supabase } from '../../../supabaseClient';
 
 export const BlogManagementModule: React.FC = () => {
   const [view, setView] = useState<'list' | 'editor' | 'categories'>('list');
@@ -42,9 +43,11 @@ export const BlogManagementModule: React.FC = () => {
   const fetchPosts = async () => {
     setLoading(true);
     try {
-      const res = await fetch('/api/admin/blog/posts');
-      const data = await res.json();
-      if (Array.isArray(data)) setPosts(data);
+      const { data, error } = await supabase
+        .from('blog_posts')
+        .select('*')
+        .order('data_publicacao', { ascending: false });
+      if (!error && Array.isArray(data)) setPosts(data);
     } catch (e) {
       console.error(e);
     } finally {
@@ -54,9 +57,11 @@ export const BlogManagementModule: React.FC = () => {
 
   const fetchCategories = async () => {
     try {
-      const res = await fetch('/api/admin/blog/categories');
-      const data = await res.json();
-      if (Array.isArray(data)) setCategories(data);
+      const { data, error } = await supabase
+        .from('blog_categories')
+        .select('*')
+        .order('nome', { ascending: true });
+      if (!error && Array.isArray(data)) setCategories(data);
     } catch (e) {
       console.error(e);
     }

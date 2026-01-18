@@ -7,35 +7,22 @@ const Blog: React.FC = () => {
   const [loading, setLoading] = React.useState(true);
 
   React.useEffect(() => {
-    fetch('/api/blog')
-      .then(res => res.json())
-      .then(data => {
-        setPosts(data);
+    const fetchPosts = async () => {
+      try {
+        const { data, error } = await import('../../supabaseClient').then(m => m.supabase)
+          .from('blog_posts')
+          .select('*')
+          .order('data_publicacao', { ascending: false });
+        if (!error && Array.isArray(data)) {
+          setPosts(data);
+        }
+      } catch (e) {
+        setPosts([]);
+      } finally {
         setLoading(false);
-      })
-      .catch(() => {
-        setPosts([
-          { 
-            title: "Lei do Superendividamento: Como sair do sufoco financeiro legalmente", 
-            date: "20 Mai, 2024",
-            image: "https://heyboss.heeyo.ai/gemini-image-c5df3e56df0a49fdb468a4708ef7c8a8.png",
-            url: "#"
-          },
-          { 
-            title: "Justiça garante preservação do mínimo existencial para famílias endividadas", 
-            date: "12 Mai, 2024",
-            image: "https://heyboss.heeyo.ai/gemini-image-805a2be1c3c8401c828287f865b36b4c.png",
-            url: "#"
-          },
-          { 
-            title: "Renegociação em bloco: A estratégia definitiva contra juros abusivos", 
-            date: "05 Mai, 2024",
-            image: "https://heyboss.heeyo.ai/gemini-image-66fd2e2355974def87a7cb3056023985.png",
-            url: "#"
-          }
-        ]);
-        setLoading(false);
-      });
+      }
+    };
+    fetchPosts();
   }, []);
 
   return (

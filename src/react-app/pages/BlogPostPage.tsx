@@ -6,6 +6,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
+import { supabase } from '../../supabaseClient';
 import { 
   ArrowLeft, 
   Calendar, 
@@ -33,26 +34,26 @@ const BlogPostPage = () => {
 
   useEffect(() => {
     window.scrollTo(0, 0);
-    
-    fetch(`/api/blog/${slug}`)
-      .then(res => res.json())
-      .then(data => {
-        if (data.error) {
-          navigate('/blog');
-        } else {
-          setPost(data);
-          document.title = `${data.meta_titulo || data.titulo} | Blog Hermida Maia`;
-          
-          // Atualizar meta tags dinamicamente (simulado para SPA)
-          const metaDesc = document.querySelector('meta[name="description"]');
-          if (metaDesc) metaDesc.setAttribute('content', data.meta_descricao || data.resumo || '');
-        }
+    const fetchPost = async () => {
+      setLoading(true);
+      const { data, error } = await supabase
+        .from('blog_posts')
+        .select('*')
+        .eq('slug', slug)
+        .single();
+      if (error || !data) {
+        navigate('/blog');
         setLoading(false);
-      })
-      .catch(err => {
-        console.error('Erro ao carregar post:', err);
-        setLoading(false);
-      });
+        return;
+      }
+      setPost(data);
+      document.title = `${data.meta_titulo || data.titulo} | Blog Hermida Maia`;
+      // Atualizar meta tags dinamicamente (simulado para SPA)
+      const metaDesc = document.querySelector('meta[name="description"]');
+      if (metaDesc) metaDesc.setAttribute('content', data.meta_descricao || data.resumo || '');
+      setLoading(false);
+    };
+    fetchPost();
   }, [slug, navigate]);
 
   const handleNewsletterSubmit = async (formData: any) => {
