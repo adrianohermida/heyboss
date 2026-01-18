@@ -6,6 +6,7 @@
 // - Router: react-router-dom para navegação
 // - Responsivo, acessível, mobile-first, tokenização CSS
 import React, { useState, useEffect } from 'react';
+import { supabase } from '../supabaseClient';
 import Header from '../components/Header';
 import { useAuth } from '../auth/supabaseAuth';
 import ClientPortalSidebar from '../components/ClientPortal/ClientPortalSidebar';
@@ -15,7 +16,46 @@ const ClientPortal: React.FC = () => {
   const { user } = useAuth();
   const [activeTab, setActiveTab] = useState('overview');
   const [summary, setSummary] = useState({ processos: 0, faturas: 0, tickets: 0, appointments: 0 });
+  const [faturas, setFaturas] = useState<any[]>([]);
+  const [loadingFaturas, setLoadingFaturas] = useState(true);
+  const [documentos, setDocumentos] = useState<any[]>([]);
+  const [loadingDocumentos, setLoadingDocumentos] = useState(true);
   const [exporting, setExporting] = useState(false);
+  const [appointments, setAppointments] = useState<any[]>([]);
+  const [loadingAppointments, setLoadingAppointments] = useState(true);
+
+  // Estado para cliente_id e escritorio_id do CRM
+  const [clienteId, setClienteId] = useState<string | null>(null);
+  const [escritorioId, setEscritorioId] = useState<string | null>(null);
+  const [loadingCliente, setLoadingCliente] = useState(true);
+
+  // Buscar cliente do CRM ao autenticar
+  useEffect(() => {
+    const fetchCliente = async () => {
+      setLoadingCliente(true);
+      if (!user?.email) {
+        setClienteId(null);
+        setEscritorioId(null);
+        setLoadingCliente(false);
+        return;
+      }
+      // Busca o cliente pelo email do usuário autenticado
+      const { data, error } = await supabase
+        .from('crm.clientes')
+        .select('id, escritorio_id')
+        .eq('email', user.email)
+        .single();
+      if (data && !error) {
+        setClienteId(data.id);
+        setEscritorioId(data.escritorio_id);
+      } else {
+        setClienteId(null);
+        setEscritorioId(null);
+      }
+      setLoadingCliente(false);
+    };
+    fetchCliente();
+  }, [user]);
 
   // Removido: handleExportData e exportação de dados via endpoint inexistente
 
@@ -93,7 +133,7 @@ const ClientPortal: React.FC = () => {
                   </div>
                 </div>
 
-                {loading ? (
+                {loadingFaturas ? (
                   <div className="flex justify-center py-20"><Loader2 className="animate-spin text-brand-primary" size={40} /></div>
                 ) : faturas.length > 0 ? (
                   <div className="grid gap-4">
@@ -127,32 +167,14 @@ const ClientPortal: React.FC = () => {
                         </div>
 
                         <div className="flex gap-2 w-full sm:w-auto">
-                          {fatura.status !== 'Pago' && (
+                          {fatura.status !== 'Pago' && fatura.payment_link ? (
                             <button 
-                              onClick={async (e) => {
-                                const btn = e.currentTarget;
-                                btn.disabled = true;
-                                const originalText = btn.innerHTML;
-                                btn.innerHTML = '<div class="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>';
-                                
-                                try {
-                                  const res = await fetch(`/api/admin/faturas/${fatura.id}/create-payment-link`, { method: 'POST' });
-                                  const data = await res.json();
-                                  if (data.checkoutUrl) {
-                                    const isInIframe = window.self !== window.top;
-                                    if (isInIframe) {
-                                      window.open(data.checkoutUrl, "_blank");
-                                    } else {
-                                      window.location.href = data.checkoutUrl;
-                                    }
-                                  } else {
-                                    console.error("Erro ao processar pagamento:", data.error);
-                                  }
-                                } catch (err) {
-                                  console.error("Erro de rede ao processar pagamento:", err);
-                                } finally {
-                                  btn.disabled = false;
-                                  btn.innerHTML = originalText;
+                              onClick={() => {
+                                const isInIframe = window.self !== window.top;
+                                if (isInIframe) {
+                                  window.open(fatura.payment_link, "_blank");
+                                } else {
+                                  window.location.href = fatura.payment_link;
                                 }
                               }}
                               className="flex-1 sm:flex-none bg-brand-primary hover:bg-brand-primary/90 text-white px-6 py-3 rounded-xl font-bold text-sm flex items-center justify-center gap-2 transition-all shadow-lg shadow-brand-primary/20 disabled:opacity-50"
@@ -160,7 +182,7 @@ const ClientPortal: React.FC = () => {
                               <CreditCard size={18} />
                               Pagar Agora
                             </button>
-                          )}
+                          ) : null}
                           <button className="flex-1 sm:flex-none bg-white/5 hover:bg-white/10 text-white px-4 py-3 rounded-xl font-bold text-sm flex items-center justify-center gap-2 transition-all border border-white/10">
                             <Download size={18} />
                           </button>
@@ -178,13 +200,37 @@ const ClientPortal: React.FC = () => {
                 )}
               </div>
             )}
+  // Fetch faturas from Supabase on mount or when user changes
+  useEffect(() => {
+    const fetchFaturas = async () => {
+      setLoadingFaturas(true);
+      if (!user) {
+        setFaturas([]);
+        setLoadingFaturas(false);
+        return;
+      }
+      // Adjust the filter below to match your schema (e.g., user_id or email)
+      const { data, error } = await supabase
+        .from('faturas')
+        .select('*')
+        .eq('user_id', user.id)
+        .order('data_vencimento', { ascending: false });
+      if (error) {
+        setFaturas([]);
+      } else {
+        setFaturas(data || []);
+      }
+      setLoadingFaturas(false);
+    };
+    fetchFaturas();
+  }, [user]);
 
             {activeTab === 'documentos' && (
               <div className="space-y-6 animate-fade-in">
                 <div className="flex items-center justify-between">
                   <h2 className="text-2xl font-extrabold">Meus Documentos</h2>
                   <button 
-                    onClick={() => fetchData('documentos')}
+                    onClick={() => fetchDocumentos()}
                     className="p-2 hover:bg-white/5 rounded-xl transition-all text-white/40 hover:text-white"
                   >
                     <Clock size={20} />
@@ -201,14 +247,12 @@ const ClientPortal: React.FC = () => {
                       id="documentos_plano_form"
                       schema={allConfigs['documentos_plano_form'].jsonSchema}
                       onSubmit={async (data) => {
-                        const res = await fetch('/api/forms/submit', {
-                          method: 'POST',
-                          headers: { 'Content-Type': 'application/json' },
-                          body: JSON.stringify({ formId: 'documentos_plano', formData: { ...data, email: user?.email } })
-                        });
-                        if (res.ok) {
+                        const { error } = await supabase
+                          .from('documentos')
+                          .insert([{ form_data: { ...data, email: user?.email }, user_id: user?.id }]);
+                        if (!error) {
                           alert('Documento enviado com sucesso!');
-                          fetchData('documentos');
+                          fetchDocumentos();
                         }
                       }}
                       theme={contactFormTheme}
@@ -217,7 +261,7 @@ const ClientPortal: React.FC = () => {
 
                   <div className="space-y-4">
                     <h3 className="text-xl font-bold mb-6">Documentos Enviados</h3>
-                    {loading ? (
+                    {loadingDocumentos ? (
                       <div className="flex justify-center py-10"><Loader2 className="animate-spin text-brand-primary" /></div>
                     ) : documentos.length > 0 ? (
                       <div className="grid gap-3">
@@ -252,6 +296,31 @@ const ClientPortal: React.FC = () => {
                 </div>
               </div>
             )}
+  // Fetch documentos from Supabase
+  const fetchDocumentos = async () => {
+    setLoadingDocumentos(true);
+    if (!user) {
+      setDocumentos([]);
+      setLoadingDocumentos(false);
+      return;
+    }
+    const { data, error } = await supabase
+      .from('documentos')
+      .select('*')
+      .eq('user_id', user.id)
+      .order('created_at', { ascending: false });
+    if (error) {
+      setDocumentos([]);
+    } else {
+      setDocumentos(data || []);
+    }
+    setLoadingDocumentos(false);
+  };
+
+  // Fetch documentos on mount or when user changes
+  useEffect(() => {
+    fetchDocumentos();
+  }, [user]);
 
             {activeTab === 'plano' && (
               <div className="space-y-6 animate-fade-in">
@@ -384,13 +453,15 @@ const ClientPortal: React.FC = () => {
                               <button 
                                 onClick={async () => {
                                   if (confirm('Deseja realmente cancelar este agendamento?')) {
-                                    const res = await fetch(`/api/appointments/${app.id}/cancel`, { method: 'POST' });
-                                    if (res.ok) {
+                                    const { error } = await supabase
+                                      .from('appointments')
+                                      .update({ status: 'cancelado' })
+                                      .eq('id', app.id);
+                                    if (!error) {
                                       alert('Agendamento cancelado com sucesso.');
-                                      fetch('/api/my-appointments').then(r => r.json()).then(setAppointments);
+                                      fetchAppointments();
                                     } else {
-                                      const err = await res.json();
-                                      alert(err.error || 'Erro ao cancelar.');
+                                      alert(error.message || 'Erro ao cancelar.');
                                     }
                                   }
                                 }}
@@ -407,6 +478,31 @@ const ClientPortal: React.FC = () => {
                 )}
               </div>
             )}
+  // Fetch appointments from Supabase
+  const fetchAppointments = async () => {
+    setLoadingAppointments(true);
+    if (!user) {
+      setAppointments([]);
+      setLoadingAppointments(false);
+      return;
+    }
+    const { data, error } = await supabase
+      .from('appointments')
+      .select('*')
+      .eq('user_id', user.id)
+      .order('created_at', { ascending: false });
+    if (error) {
+      setAppointments([]);
+    } else {
+      setAppointments(data || []);
+    }
+    setLoadingAppointments(false);
+  };
+
+  // Fetch appointments on mount or when user changes
+  useEffect(() => {
+    fetchAppointments();
+  }, [user]);
 
             {activeTab === 'tickets' && <TicketsModule />}
           </div>
@@ -425,30 +521,44 @@ const TicketsModule = () => {
   const [reply, setReply] = useState("");
   const [sendingReply, setSendingReply] = useState(false);
 
+  // Fetch tickets from Supabase
   const fetchTickets = async () => {
     setLoading(true);
-    try {
-      const res = await fetch('/api/tickets');
-      if (res.ok) setTickets(await res.json());
-    } catch (e) {
-      console.error(e);
-    } finally {
+    if (!user) {
+      setTickets([]);
       setLoading(false);
+      return;
     }
+    const { data, error } = await supabase
+      .from('tickets')
+      .select('*')
+      .eq('user_id', user.id)
+      .order('updated_at', { ascending: false });
+    if (error) {
+      setTickets([]);
+    } else {
+      setTickets(data || []);
+    }
+    setLoading(false);
   };
 
+  // Fetch messages for a ticket from Supabase
   const fetchMessages = async (id: number) => {
-    try {
-      const res = await fetch(`/api/tickets/${id}/messages`);
-      if (res.ok) setMessages(await res.json());
-    } catch (e) {
-      console.error(e);
+    const { data, error } = await supabase
+      .from('ticket_threads')
+      .select('*')
+      .eq('ticket_id', id)
+      .order('created_at', { ascending: true });
+    if (error) {
+      setMessages([]);
+    } else {
+      setMessages(data || []);
     }
   };
 
   useEffect(() => {
     fetchTickets();
-  }, []);
+  }, [user]);
 
   useEffect(() => {
     if (selectedTicket) {
@@ -458,16 +568,15 @@ const TicketsModule = () => {
     }
   }, [selectedTicket]);
 
+  // Send reply to ticket (insert into ticket_threads)
   const handleSendReply = async () => {
     if (!reply.trim() || sendingReply) return;
     setSendingReply(true);
     try {
-      const res = await fetch(`/api/tickets/${selectedTicket.id}/reply`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ message: reply })
-      });
-      if (res.ok) {
+      const { error } = await supabase
+        .from('ticket_threads')
+        .insert([{ ticket_id: selectedTicket.id, message: reply, is_admin: false, user_id: user.id }]);
+      if (!error) {
         setReply("");
         fetchMessages(selectedTicket.id);
       }
@@ -644,12 +753,61 @@ const TicketsModule = () => {
                 id="ticket_form"
                 schema={allConfigs['ticket_form'].jsonSchema}
                 onSubmit={async (data) => {
-                  const res = await fetch('/api/tickets', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(data)
-                  });
-                  if (res.ok) {
+                  // Busca sessão ativa do Balcão Virtual para o usuário (se houver)
+                  let sessaoId = null;
+                  let logsConversa = [];
+                  if (user?.email) {
+                    const { data: sessao, error: sessaoError } = await supabase
+                      .from('balcao_virtual.sessoes_ativas')
+                      .select('id')
+                      .eq('usuario_email', user.email)
+                      .eq('status', 'IA_TALKING')
+                      .order('criado_em', { ascending: false })
+                      .limit(1)
+                      .maybeSingle();
+                    if (sessao && sessao.id) {
+                      sessaoId = sessao.id;
+                      // Busca histórico da conversa
+                      const { data: logs, error: logsError } = await supabase
+                        .from('balcao_virtual.logs_conversas')
+                        .select('id, role, text, criado_em')
+                        .eq('sessao_id', sessaoId)
+                        .order('criado_em', { ascending: true });
+                      if (logs && !logsError) {
+                        logsConversa = logs;
+                      }
+                    }
+                  }
+
+                  // Cria o ticket no schema correto
+                  const ticketInsert = {
+                    cliente_id: clienteId,
+                    escritorio_id: escritorioId,
+                    titulo: data.titulo || data.subject || 'Chamado',
+                    descricao: data.descricao || data.message || '',
+                    status: 'aberto',
+                    prioridade: data.prioridade || data.priority || 'Normal',
+                    canal: sessaoId ? 'balcao_virtual' : 'portal',
+                    // campos extras se necessário
+                  };
+                  const { data: ticketData, error: ticketError } = await supabase
+                    .from('tickets.tickets')
+                    .insert([ticketInsert])
+                    .select('id')
+                    .single();
+                  if (!ticketError && ticketData?.id) {
+                    // Se houver histórico de conversa, importar como comentários do ticket
+                    if (logsConversa.length > 0) {
+                      const comments = logsConversa.map((log: any) => ({
+                        ticket_id: ticketData.id,
+                        autor_tipo: log.role === 'user' ? 'cliente' : 'agente',
+                        mensagem: log.text,
+                        created_at: log.criado_em
+                      }));
+                      if (comments.length > 0) {
+                        await supabase.from('tickets.ticket_comments').insert(comments);
+                      }
+                    }
                     setIsCreating(false);
                     fetchTickets();
                   }
