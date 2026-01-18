@@ -1,6 +1,19 @@
-// TicketsModule definition (must be above ClientPortal)
 
+// ------------------- IMPORTS -------------------
+import React, { useState, useEffect } from 'react';
+import { AlertCircle, Wallet, MessageSquare, ChevronRight, X, Calendar as CalendarIcon, Loader2, Scale, CheckCircle2, Clock, CreditCard, Download, Plus, FileText, ExternalLink } from 'lucide-react';
+import clsx from 'clsx';
+import { Link } from 'react-router-dom';
+import allConfigs from '../../shared/form-configs.json';
+import { CustomForm } from '../components/CustomForm/CustomForm';
+import { contactFormTheme } from '../components/CustomForm/themes';
+import { useAuth } from '../auth/supabaseAuth';
+import { supabase } from '../../supabaseClient';
+import ClientPortalSidebar from '../components/ClientPortal/ClientPortalSidebar';
+import ClientPortalOverview from '../components/ClientPortal/ClientPortalOverview';
+import Header from '../components/Header';
 
+// ------------------- TICKETS MODULE -------------------
 const TicketsModule = ({ user, clienteId, escritorioId }: { user: any, clienteId: string | null, escritorioId: string | null }) => {
   const [tickets, setTickets] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
