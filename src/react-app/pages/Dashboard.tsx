@@ -1,4 +1,3 @@
-
 // Manifesto: Dashboard
 // - Modular: DashboardSidebar, DashboardHeaderActions, DashboardSkeleton, módulos de cada aba
 // - Skeleton: loading states em cada módulo
@@ -102,15 +101,24 @@ const AIModule = ({ data }: { data: any[] }) => (
   </div>
 );
 
+import { supabase } from '../supabaseClient';
 const AdminAgendaModule = () => {
   const [appointments, setAppointments] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const { user } = useAuth();
 
+  // Busca multitenant: só compromissos do usuário logado
   const fetchAppointments = async () => {
     setLoading(true);
     try {
-      const res = await fetch('/api/admin/appointments');
-      if (res.ok) setAppointments(await res.json());
+      if (!user) return;
+      const { data, error } = await supabase
+        .from('appointments')
+        .select('*')
+        .eq('user_id', user.id)
+        .order('created_at', { ascending: false });
+      if (error) throw error;
+      setAppointments(data || []);
     } catch (e) {
       console.error(e);
     } finally {
@@ -120,17 +128,19 @@ const AdminAgendaModule = () => {
 
   useEffect(() => {
     fetchAppointments();
-  }, []);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user]);
 
   const handleStatusUpdate = async (id: number, status: string) => {
     const notes = prompt('Observações (opcional):');
     try {
-      const res = await fetch(`/api/admin/appointments/${id}/status`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ status, notes })
-      });
-      if (res.ok) fetchAppointments();
+      const { error } = await supabase
+        .from('appointments')
+        .update({ status, notes })
+        .eq('id', id)
+        .eq('user_id', user.id); // multitenant: só pode alterar do próprio usuário
+      if (error) throw error;
+      fetchAppointments();
     } catch (e) {
       alert('Erro ao atualizar status.');
     }
@@ -163,13 +173,13 @@ const AdminAgendaModule = () => {
                   <div>
                     <div className="flex items-center gap-2 mb-1">
                       <span className="bg-brand-primary/10 text-brand-primary text-[9px] font-bold uppercase px-2 py-0.5 rounded-md">
-                        {app.form_data.appointment_type === 'tecnica' ? 'Consulta Técnica' : 'Avaliação'}
+                        {app.form_data?.appointment_type === 'tecnica' ? 'Consulta Técnica' : 'Avaliação'}
                       </span>
-                      <p className="text-white/40 text-[10px] font-bold uppercase">{new Date(app.form_data.appointment_date).toLocaleDateString('pt-BR')} às {app.form_data.appointment_time}</p>
+                      <p className="text-white/40 text-[10px] font-bold uppercase">{app.form_data ? new Date(app.form_data.appointment_date).toLocaleDateString('pt-BR') : ''} às {app.form_data?.appointment_time}</p>
                     </div>
-                    <h3 className="text-lg font-bold">{app.form_data.name}</h3>
-                    <p className="text-sm text-white/50">{app.form_data.email} • {app.form_data.phone}</p>
-                    <p className="text-xs text-white/30 mt-2 italic">"{app.form_data.reason}"</p>
+                    <h3 className="text-lg font-bold">{app.form_data?.name}</h3>
+                    <p className="text-sm text-white/50">{app.form_data?.email} • {app.form_data?.phone}</p>
+                    <p className="text-xs text-white/30 mt-2 italic">"{app.form_data?.reason}"</p>
                   </div>
                 </div>
 
@@ -179,7 +189,7 @@ const AdminAgendaModule = () => {
                     app.status === 'confirmado' ? "bg-green-500/10 text-green-400" : 
                     app.status === 'aguardando_aceite' ? "bg-yellow-500/10 text-yellow-400" : "bg-red-500/10 text-red-400"
                   )}>
-                    {app.status.replace('_', ' ')}
+                    {app.status?.replace('_', ' ')}
                   </span>
                   
                   {app.status === 'aguardando_aceite' && (
@@ -541,4 +551,16 @@ const ConfigModule = () => {
 };
 
 export default Dashboard;
+
+// Buscar compromissos do usuário autenticado
+const { data, error } = await supabase
+  .from('appointments')
+  .select('*')
+  .eq('user_id', supaUser.id);
+
+// Atualizar status do compromisso
+const { error } = await supabase
+  .from('appointments')
+  .update({ status, notes })
+  .eq('id', id);
 

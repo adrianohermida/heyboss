@@ -6,10 +6,11 @@
  *             Important variables: email (from query params), status (loading/success/error).
  */
 
+
 import React, { useEffect, useState } from 'react';
 import { useSearchParams, Link } from 'react-router-dom';
 import { MailX, CheckCircle2, AlertCircle, ArrowLeft, Loader2 } from 'lucide-react';
-
+import { supabase } from '../supabaseClient';
 import Header from '../components/Header';
 import ScrollToTopButton from '../components/ScrollToTopButton';
 import Footer from '../components/Footer';
@@ -32,19 +33,16 @@ export const UnsubscribePage: React.FC = () => {
 
     setStatus('loading');
     try {
-      const response = await fetch('/api/newsletter/unsubscribe', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email }),
-      });
-
-      const result = await response.json();
-      if (response.ok) {
+      const { error } = await supabase
+        .from('newsletter_subscribers')
+        .delete()
+        .eq('email', email);
+      if (!error) {
         setStatus('success');
-        setMessage(result.message || 'Você foi removido da nossa lista com sucesso.');
+        setMessage('Você foi removido da nossa lista com sucesso.');
       } else {
         setStatus('error');
-        setMessage(result.error || 'Ocorreu um erro ao processar sua solicitação.');
+        setMessage('Ocorreu um erro ao processar sua solicitação.');
       }
     } catch (error) {
       setStatus('error');

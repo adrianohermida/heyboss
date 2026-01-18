@@ -1,5 +1,3 @@
-
-
 /**
  * @description Página de Perfil do Usuário para Hermida Maia Advocacia.
  *             Permite que advogados e membros da equipe editem seus dados profissionais.
@@ -45,12 +43,11 @@ const ProfilePage = () => {
     setSaving(true);
     setMessage(null);
     try {
-      const res = await fetch('/api/usuarios_ext', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(formData)
-      });
-      if (res.ok) {
+      // Atualizar perfil
+      const { error } = await supabase
+        .from('usuarios_ext')
+        .upsert([{ ...formData, id: supaUser.id }]);
+      if (!error) {
         setMessage({ type: 'success', text: 'Perfil atualizado com sucesso!' });
       } else {
         setMessage({ type: 'error', text: 'Erro ao atualizar perfil.' });
