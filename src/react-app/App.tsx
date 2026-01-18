@@ -1,7 +1,9 @@
+
+import { lazy, Suspense } from 'react'
+import { Routes, Route, useLocation } from 'react-router-dom'
+
 const AboutPage2 = lazy(() => import('./pages/AboutPage2'));
 const ContactPage2 = lazy(() => import('./pages/ContactPage2'));
-import { Routes, Route, useLocation } from 'react-router-dom'
-import { lazy, Suspense } from 'react'
 
 import Header from './components/Header'
 // Lazy load components para melhor performance
