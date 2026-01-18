@@ -1,3 +1,4 @@
+
 import ClientPortalAgenda from '../components/ClientPortal/ClientPortalAgenda';
 import ClientPortalPlano from '../components/ClientPortal/ClientPortalPlano';
 import ClientPortalDocumentos from '../components/ClientPortal/ClientPortalDocumentos';
@@ -16,6 +17,7 @@ import ClientPortalOverview from '../components/ClientPortal/ClientPortalOvervie
 import Header from '../components/Header';
 import TicketsModule from '../components/Dashboard/TicketsModule';
 import ClientPortalFaturas from '../components/ClientPortal/ClientPortalFaturas';
+
 
 const ClientPortal: React.FC = () => {
   // --- HOOKS E ESTADO ---
