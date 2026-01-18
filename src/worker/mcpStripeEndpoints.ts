@@ -32,4 +32,4 @@ app.post('/api/mcp/stripe/subscription/cancel', async (c) => {
   return c.json({ result });
 });
 
-export default app;
+

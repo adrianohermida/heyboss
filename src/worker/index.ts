@@ -1,118 +1,46 @@
-import { Hono } from "hono";
-import { getCookie, setCookie } from "hono/cookie";
-import {
 
-  /**
-   * Cloudflare Worker: Proxy/CORS para Supabase
-   * Todas as rotas /api/* são redirecionadas para o endpoint REST do Supabase.
-   * Ajusta CORS para permitir qualquer origem.
-   * Não expõe lógica de negócio, apenas proxy seguro.
-   *
-   * Edite o endpoint Supabase conforme necessário.
-   */
+/**
+ * Cloudflare Worker: Proxy/CORS para Supabase
+ * Todas as rotas /api/* são redirecionadas para o endpoint REST do Supabase.
+ * Ajusta CORS para permitir qualquer origem.
+ * Não expõe lógica de negócio, apenas proxy seguro.
+ *
+ * Edite o endpoint Supabase conforme necessário.
+ */
 
-  const SUPABASE_BASE = 'https://sspvizogbcyigquqycsz.supabase.co'; // endpoint do seu projeto
+const SUPABASE_BASE = 'https://sspvizogbcyigquqycsz.supabase.co'; // endpoint do seu projeto
 
-  export default {
-    async fetch(request: Request): Promise<Response> {
-      const url = new URL(request.url);
-      if (url.pathname.startsWith('/api/')) {
-        // Mapeia /api/foo -> /rest/v1/foo
-        const supabasePath = '/rest/v1/' + url.pathname.replace(/^\/api\//, '');
-        const proxyUrl = SUPABASE_BASE + supabasePath + (url.search || '');
-        const proxyReq = new Request(proxyUrl, {
-          method: request.method,
-          headers: request.headers,
-          body: request.method !== 'GET' && request.method !== 'HEAD' ? request.body : undefined,
-          redirect: 'manual',
-        });
-        let resp = await fetch(proxyReq);
-        // CORS headers
-        const corsHeaders = {
-          'Access-Control-Allow-Origin': '*',
-          'Access-Control-Allow-Methods': 'GET,POST,PUT,PATCH,DELETE,OPTIONS',
-          'Access-Control-Allow-Headers': request.headers.get('Access-Control-Request-Headers') || '*',
-          'Access-Control-Allow-Credentials': 'true',
-        };
-        if (request.method === 'OPTIONS') {
-          return new Response(null, { status: 204, headers: corsHeaders });
-        }
-        const newHeaders = new Headers(resp.headers);
-        Object.entries(corsHeaders).forEach(([k, v]) => newHeaders.set(k, v));
-        return new Response(resp.body, { status: resp.status, headers: newHeaders });
-      }
-      return new Response('Not found', { status: 404 });
-    }
-  };
-    }
-  }
-  // ...existing Stripe status logic...
-  return c.json({ googleCalendar });
-});
-
-app.get("/api/oauth/google/redirect_url", async (c) => {
-  const origin = c.req.query("originUrl") || "";
-  const redirectUrl = await getOAuthRedirectUrl("google", {
-    originUrl: origin,
-  });
-  return c.json({ redirectUrl }, 200);
-});
-
-app.post("/api/sessions", async (c) => {
-  const body = await c.req.json();
-  if (!body.code) return c.json({ error: "No authorization code provided" }, 400);
-
-  const sessionToken = await exchangeCodeForSessionToken(body.code, c.env.PROJECT_ID);
-
-  try {
-    const user = await getCurrentUser(sessionToken);
-    if (user && user.email) {
-      await CustomerService.save(c.env.DB, {
-        formData: { email: user.email, email_verified: true, email_consent: true, name: user.name },
-        source: "google-oauth",
+export default {
+  async fetch(request) {
+    const url = new URL(request.url);
+    if (url.pathname.startsWith('/api/')) {
+      // Mapeia /api/foo -> /rest/v1/foo
+      const supabasePath = '/rest/v1/' + url.pathname.replace(/^\/api\//, '');
+      const proxyUrl = SUPABASE_BASE + supabasePath + (url.search || '');
+      const proxyReq = new Request(proxyUrl, {
+        method: request.method,
+        headers: request.headers,
+        body: request.method !== 'GET' && request.method !== 'HEAD' ? request.body : undefined,
+        redirect: 'manual',
       });
+      let resp = await fetch(proxyReq);
+      // CORS headers
+      const corsHeaders = {
+        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Methods': 'GET,POST,PUT,PATCH,DELETE,OPTIONS',
+        'Access-Control-Allow-Headers': request.headers.get('Access-Control-Request-Headers') || '*',
+        'Access-Control-Allow-Credentials': 'true',
+      };
+      if (request.method === 'OPTIONS') {
+        return new Response(null, { status: 204, headers: corsHeaders });
+      }
+      const newHeaders = new Headers(resp.headers);
+      Object.entries(corsHeaders).forEach(([k, v]) => newHeaders.set(k, v));
+      return new Response(resp.body, { status: resp.status, headers: newHeaders });
     }
-  } catch (error) {
-    console.error("Failed to save customer after Google login:", error);
+    return new Response('Not found', { status: 404 });
   }
-
-  setCookie(c, SESSION_TOKEN_COOKIE_NAME, sessionToken, {
-    httpOnly: true,
-    path: "/",
-    sameSite: "none",
-    secure: true,
-    maxAge: 1 * 24 * 60 * 60,
-  });
-
-  return c.json({ success: true }, 200);
-});
-
-app.get("/api/users/me", authMiddleware, async (c) => {
-  //@ts-ignore
-  const user = c.get("user");
-  if (!user || !user.email) return c.json(user);
-
-  const userEmail = user.email.toLowerCase();
-  const adminEmails = (c.env.ADMIN_EMAILS || "").split(",").map((e: string) => e.trim().toLowerCase());
-  const ownerEmail = (c.env.USER_EMAIL || "").toLowerCase();
-  
-  const isExplicitAdmin = adminEmails.includes(userEmail) || 
-                         (ownerEmail !== "" && ownerEmail !== "user_email" && userEmail === ownerEmail) ||
-                         userEmail === "adrianohermida@gmail.com" ||
-                         userEmail === "contato@hermidamaia.adv.br";
-  
-  let isAdmin = isExplicitAdmin;
-  if (!isAdmin) {
-    try {
-      const profile = await c.env.DB.prepare("SELECT id FROM user_profiles WHERE LOWER(user_email) = ?").bind(userEmail).first();
-      if (profile) isAdmin = true;
-    } catch (e) {}
-  }
-  
-  await logAudit(c.env.DB, "user_profile", "view_me", userEmail);
-  
-  return c.json({ ...user, isAdmin });
-});
+};
 
 app.get("/api/logout", async (c) => {
   const sessionToken = getCookie(c, SESSION_TOKEN_COOKIE_NAME);
@@ -970,4 +898,3 @@ app.get("/api/blog/:slug", async (c) => {
   }
 });
 
-export default app;
