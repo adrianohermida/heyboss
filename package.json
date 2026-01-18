@@ -1,1 +1,1 @@
-{"scripts":{"build":"vite build","deploy":"wrangler deploy --env production"},"devDependencies":{"vite":"^7.3.1"}}
+{"scripts":{"build":"vite build","deploy":"wrangler deploy --env production"},"devDependencies":{"@vitejs/plugin-react":"^5.1.2","vite":"^7.3.1"}}
