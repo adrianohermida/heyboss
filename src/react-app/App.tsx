@@ -26,6 +26,7 @@ const CheckoutErrorPage = lazy(() => import('./pages/CheckoutErrorPage'))
 const CheckoutCancelPage = lazy(() => import('./pages/CheckoutCancelPage'))
 const BlogPostPage = lazy(() => import('./pages/BlogPostPage'))
 const AppointmentsPage = lazy(() => import('./pages/AppointmentsPage'))
+const ThemeTestPage = lazy(() => import('./pages/ThemeTestPage'))
 const AuthCallback = lazy(() => import('./pages/AuthCallback'))
 const NotFoundPage = lazy(() => import('./pages/NotFoundPage'))
 
@@ -75,6 +76,7 @@ export default function App() {
           <Route path="/checkout/cancel" element={<CheckoutCancelPage />} />
           <Route path="/appointments" element={<AppointmentsPage />} />
           <Route path="/auth/callback" element={<AuthCallback />} />
+          <Route path="/theme-test" element={<ThemeTestPage />} />
           {/* Protected Routes */}
           <Route element={<AuthProtect />}>
             <Route path="/dashboard" element={<Dashboard />} />
