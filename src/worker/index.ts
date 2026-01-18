@@ -1,176 +1,49 @@
 import { Hono } from "hono";
 import { getCookie, setCookie } from "hono/cookie";
 import {
-  exchangeCodeForSessionToken,
-  getOAuthRedirectUrl,
-  authMiddleware,
-  deleteSession,
-  SESSION_TOKEN_COOKIE_NAME,
-  sendOTP,
-  verifyOTP,
-  getCurrentUser,
-} from "@hey-boss/users-service/backend";
-import { CustomerService } from "../shared/customers-service";
-import { jwtVerify } from 'jose';
 
-const app = new Hono<{
-  Bindings: {
-    DB: D1Database;
-    API_KEY: string;
-    USER_ID: string;
-    PROJECT_ID: string;
-    USER_EMAIL: string;
-    AUTH_KEY: string;
-    ADMIN_EMAILS: string;
-    STRIPE_SECRET_KEY: string;
-    STRIPE_CONNECT_ACCOUNT_ID?: string;
+  /**
+   * Cloudflare Worker: Proxy/CORS para Supabase
+   * Todas as rotas /api/* são redirecionadas para o endpoint REST do Supabase.
+   * Ajusta CORS para permitir qualquer origem.
+   * Não expõe lógica de negócio, apenas proxy seguro.
+   *
+   * Edite o endpoint Supabase conforme necessário.
+   */
+
+  const SUPABASE_BASE = 'https://sspvizogbcyigquqycsz.supabase.co'; // endpoint do seu projeto
+
+  export default {
+    async fetch(request: Request): Promise<Response> {
+      const url = new URL(request.url);
+      if (url.pathname.startsWith('/api/')) {
+        // Mapeia /api/foo -> /rest/v1/foo
+        const supabasePath = '/rest/v1/' + url.pathname.replace(/^\/api\//, '');
+        const proxyUrl = SUPABASE_BASE + supabasePath + (url.search || '');
+        const proxyReq = new Request(proxyUrl, {
+          method: request.method,
+          headers: request.headers,
+          body: request.method !== 'GET' && request.method !== 'HEAD' ? request.body : undefined,
+          redirect: 'manual',
+        });
+        let resp = await fetch(proxyReq);
+        // CORS headers
+        const corsHeaders = {
+          'Access-Control-Allow-Origin': '*',
+          'Access-Control-Allow-Methods': 'GET,POST,PUT,PATCH,DELETE,OPTIONS',
+          'Access-Control-Allow-Headers': request.headers.get('Access-Control-Request-Headers') || '*',
+          'Access-Control-Allow-Credentials': 'true',
+        };
+        if (request.method === 'OPTIONS') {
+          return new Response(null, { status: 204, headers: corsHeaders });
+        }
+        const newHeaders = new Headers(resp.headers);
+        Object.entries(corsHeaders).forEach(([k, v]) => newHeaders.set(k, v));
+        return new Response(resp.body, { status: resp.status, headers: newHeaders });
+      }
+      return new Response('Not found', { status: 404 });
+    }
   };
-}>();
-
-// Cloudflare Access JWT validation middleware
-const CF_ACCESS_JWKS_URL = 'https://aetherlab.cloudflareaccess.com/cdn-cgi/access/certs';
-const CF_ACCESS_AUD = '8fdfe84de533f3d875c5687ae5a40f9e6a5d292821b816df1334fb67b2a80e55';
-
-async function getCloudflareJWKs() {
-  const res = await fetch(CF_ACCESS_JWKS_URL);
-  if (!res.ok) throw new Error('Failed to fetch Cloudflare Access JWKs');
-  return await res.json();
-}
-
-app.use('*', async (c, next) => {
-  const jwt = c.req.header('Cf-Access-Jwt-Assertion');
-  if (!jwt) return c.text('Unauthorized', 401);
-  try {
-    const jwks = await getCloudflareJWKs();
-    const { payload } = await jwtVerify(jwt, jwks, { audience: CF_ACCESS_AUD });
-    c.set('cfAccessUser', payload.sub);
-    await next();
-  } catch (e) {
-    return c.text('Unauthorized', 401);
-  }
-});
-
-// =================================================================
-// == MIDDLEWARES & HELPERS                                       ==
-// =================================================================
-
-async function logAudit(db: D1Database, resource: string, action: string, actor: string, details?: any) {
-  try {
-    await db.prepare(
-      "INSERT INTO audit_logs (resource, action, actor_id, payload_hash, created_at) VALUES (?, ?, ?, ?, ?)"
-    ).bind(
-      resource, 
-      action, 
-      actor, 
-      details ? JSON.stringify(details).substring(0, 100) : null, 
-      new Date().toISOString()
-    ).run();
-  } catch (e) {
-    console.error("Audit Log Error:", e);
-  }
-}
-
-const adminPermissionMiddleware = async (c: any, next: any) => {
-  const user = c.get("user");
-  if (!user || !user.email) return c.json({ error: "Unauthorized" }, 401);
-
-  const userEmail = user.email.toLowerCase();
-  const adminEmails = (c.env.ADMIN_EMAILS || "").split(",").map((e: string) => e.trim().toLowerCase());
-  const ownerEmail = (c.env.USER_EMAIL || "").toLowerCase();
-
-  const isExplicitAdmin = adminEmails.includes(userEmail) || 
-                         (ownerEmail !== "" && ownerEmail !== "user_email" && userEmail === ownerEmail) ||
-                         userEmail === "adrianohermida@gmail.com" ||
-                         userEmail === "contato@hermidamaia.adv.br";
-
-  if (isExplicitAdmin) {
-    await next();
-    return;
-  }
-
-  const profile = await c.env.DB.prepare("SELECT id FROM user_profiles WHERE LOWER(user_email) = ?").bind(userEmail).first();
-  if (profile) {
-    await next();
-    return;
-  }
-
-  return c.json({ error: "Forbidden - Admin access required" }, 403);
-};
-
-
-// =================================================================
-// == AUTHENTICATION ROUTES                                       ==
-// =================================================================
-
-import { nanoid } from 'nanoid';
-
-// Google Calendar OAuth for admin integration
-app.get("/api/admin/google-calendar/connect", authMiddleware, adminPermissionMiddleware, async (c) => {
-  const state = nanoid();
-  await c.env.DB.prepare("INSERT INTO oauth_states (state, created_at) VALUES (?, ?)").bind(state, new Date().toISOString()).run();
-  const redirectUrl = await getOAuthRedirectUrl("google", {
-    scope: [
-      "https://www.googleapis.com/auth/calendar.events",
-      "https://www.googleapis.com/auth/calendar.readonly",
-      "openid",
-      "email",
-      "profile"
-    ],
-    state,
-    prompt: "consent",
-    access_type: "offline",
-    redirect_uri: c.env.GOOGLE_CALENDAR_REDIRECT_URI
-  });
-  return c.redirect(redirectUrl, 302);
-});
-
-app.get("/api/admin/google-calendar/callback", async (c) => {
-  const code = c.req.query("code");
-  const state = c.req.query("state");
-  if (!code || !state) return c.text("Missing code or state", 400);
-  const stateRow = await c.env.DB.prepare("SELECT * FROM oauth_states WHERE state = ?").bind(state).first();
-  if (!stateRow) return c.text("Invalid state", 400);
-  await c.env.DB.prepare("DELETE FROM oauth_states WHERE state = ?").bind(state).run();
-  const tokenRes = await fetch("https://oauth2.googleapis.com/token", {
-    method: "POST",
-    headers: { "Content-Type": "application/x-www-form-urlencoded" },
-    body: new URLSearchParams({
-      code,
-      client_id: c.env.GOOGLE_CLIENT_ID,
-      client_secret: c.env.GOOGLE_CLIENT_SECRET,
-      redirect_uri: c.env.GOOGLE_CALENDAR_REDIRECT_URI,
-      grant_type: "authorization_code"
-    })
-  });
-  const tokenData = await tokenRes.json();
-  if (!tokenData.access_token) return c.text("Failed to get tokens", 400);
-  const userInfoRes = await fetch("https://www.googleapis.com/oauth2/v2/userinfo", {
-    headers: { Authorization: `Bearer ${tokenData.access_token}` }
-  });
-  const userInfo = await userInfoRes.json();
-  if (!userInfo.email) return c.text("Failed to get user email", 400);
-  await c.env.DB.prepare(`INSERT OR REPLACE INTO google_calendar_tokens (user_email, access_token, refresh_token, expires_at, scope, token_type, id_token, created_at)
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?)`)
-    .bind(
-      userInfo.email,
-      tokenData.access_token,
-      tokenData.refresh_token,
-      new Date(Date.now() + (tokenData.expires_in || 3600) * 1000).toISOString(),
-      tokenData.scope,
-      tokenData.token_type,
-      tokenData.id_token || null,
-      new Date().toISOString()
-    ).run();
-  return c.redirect("/dashboard?google=success", 302);
-});
-
-app.get("/api/admin/integrations/status", authMiddleware, adminPermissionMiddleware, async (c) => {
-  const user = c.get("user");
-  let googleCalendar = { isConnected: false };
-  if (user && user.email) {
-    const row = await c.env.DB.prepare("SELECT * FROM google_calendar_tokens WHERE user_email = ?").bind(user.email).first();
-    if (row && row.access_token) {
-      googleCalendar = { isConnected: true, email: user.email };
     }
   }
   // ...existing Stripe status logic...
