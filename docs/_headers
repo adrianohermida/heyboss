@@ -1,0 +1,5 @@
+/clear-sw-cache.js
+  Access-Control-Allow-Origin: *
+
+/*
+  Content-Security-Policy: default-src 'self'; style-src 'self' https://fonts.googleapis.com 'unsafe-inline'; font-src 'self' https://fonts.gstatic.com; script-src 'self'; img-src 'self' data:; connect-src 'self' https://*.supabase.co; frame-src 'none';
