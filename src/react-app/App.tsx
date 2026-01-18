@@ -25,6 +25,7 @@ const CheckoutCancelPage = lazy(() => import('./pages/CheckoutCancelPage'))
 const BlogPostPage = lazy(() => import('./pages/BlogPostPage'))
 const AppointmentsPage = lazy(() => import('./pages/AppointmentsPage'))
 const AuthCallback = lazy(() => import('./pages/AuthCallback'))
+const NotFoundPage = lazy(() => import('./pages/NotFoundPage'))
 
 const LoadingFallback = () => (
   <div className="flex items-center justify-center min-h-screen bg-slate-900">
@@ -70,6 +71,8 @@ export default function App() {
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/profile" element={<ProfilePage />} />
           </Route>
+          {/* 404 Catch-all */}
+          <Route path="*" element={<NotFoundPage />} />
         </Routes>
       </Suspense>
     </div>
