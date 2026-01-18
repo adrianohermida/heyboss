@@ -1,0 +1,2 @@
+// Wrapper para rodar o script como CommonJS
+require('./clean-wrangler-deploy.cjs');

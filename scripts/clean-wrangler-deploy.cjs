@@ -1,11 +1,11 @@
-// Clean up stale wrangler deploy configs (CommonJS)
+// Clean up any old wrangler deploy configs before deploying
 const fs = require('fs');
 const path = require('path');
 
-const wranglerDeployDir = path.join(__dirname, '../.wrangler/deploy');
-if (fs.existsSync(wranglerDeployDir)) {
-  fs.rmSync(wranglerDeployDir, { recursive: true, force: true });
-  console.log('Removed stale .wrangler/deploy directory.');
+const wranglerDeployConfig = path.join('.wrangler', 'deploy', 'config.json');
+if (fs.existsSync(wranglerDeployConfig)) {
+  fs.unlinkSync(wranglerDeployConfig);
+  console.log('Deleted stale .wrangler/deploy/config.json');
 } else {
-  console.log('.wrangler/deploy directory does not exist.');
+  console.log('No stale wrangler deploy config found.');
 }
