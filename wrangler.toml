@@ -28,6 +28,8 @@ zone_name = "hermidamaia.adv.br"
 [[env.production.d1_databases]]
 binding = "heyboss_db"
 database_name = "heyboss_db"
+ 
+[env.preview]
 database_id = "223d8197-7c2d-47ab-8b63-4adb9c2998c2"
 
 [[env.production.kv_namespaces]]
