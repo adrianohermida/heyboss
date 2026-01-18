@@ -1,6 +1,8 @@
 
 
 import React from 'react';
+import { useTheme } from '../../styles/ThemeProvider';
+import clsx from 'clsx';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
 import ScrollToTopButton from '../components/ScrollToTopButton';
@@ -15,9 +17,17 @@ import Blog from '../components/Home/Blog';
 import FinalCTA from '../components/Home/FinalCTA';
 
 const HomePage: React.FC = () => {
+  const { mode } = useTheme();
   return (
     <>
-      <div className="min-h-screen bg-brand-dark selection:bg-brand-primary selection:text-white">
+      <div
+        className={clsx(
+          'min-h-screen selection:bg-brand-primary selection:text-white',
+          mode === 'clear'
+            ? 'bg-white text-gray-900'
+            : 'bg-brand-dark text-white'
+        )}
+      >
         <Header />
         <main>
           <Hero />
