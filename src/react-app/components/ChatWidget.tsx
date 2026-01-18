@@ -5,6 +5,7 @@
  */
 
 import React, { useState, useEffect, useRef } from 'react';
+import { supabase } from '../supabaseClient';
 import { MessageCircle, X, Send, Loader2, User, Bot, ChevronRight, FileText, Calendar, Search, History, MessageSquare, Receipt, Shield } from 'lucide-react';
 import { cn } from '../utils';
 import { useAuth } from '@hey-boss/users-service/react';
@@ -19,10 +20,20 @@ interface Message {
 
 const WORKER_AI_URL = "https://calm-heart-41f6.adrianohermida.workers.dev";
 
-export const ChatWidget = () => {
+interface ChatWidgetProps {
+  topicOverride?: string;
+  initialOpen?: boolean;
+}
+
+export const ChatWidget: React.FC<ChatWidgetProps> = ({ topicOverride, initialOpen }) => {
   const { user, isAuthenticated } = useAuth();
-  const [isOpen, setIsOpen] = useState(false);
+  const [isOpen, setIsOpen] = useState(initialOpen ?? false);
   const [view, setView] = useState<'chat' | 'history'>('chat');
+  const [sessionId, setSessionId] = useState<string>(() => {
+    return sessionStorage.getItem('chat_session_id') || '';
+  });
+  // Permite usar topic customizado (ex: ticket:123) ou padrão (chat:sessionId)
+  const topic = topicOverride || (sessionId ? `chat:${sessionId}` : '');
   const [messages, setMessages] = useState<Message[]>([
     {
       role: 'assistant',
@@ -32,9 +43,6 @@ export const ChatWidget = () => {
   ]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const [sessionId, setSessionId] = useState<string>(() => {
-    return sessionStorage.getItem('chat_session_id') || '';
-  });
   const [userConversations, setUserConversations] = useState<any[]>([]);
   const [hasConsent, setConsent] = useState<boolean>(() => {
     return localStorage.getItem('chat_consent') === 'true';
@@ -103,6 +111,15 @@ export const ChatWidget = () => {
     if (!overrideInput) setInput('');
     setIsLoading(true);
 
+    // Publica mensagem do usuário em realtime.messages
+    await supabase.from('realtime.messages').insert({
+      topic,
+      extension: 'chat',
+      payload: { role: 'user', content: messageText, email: user?.email },
+      event: 'user_message',
+      private: false
+    });
+
     try {
       // Envia o histórico para o Worker AI
       const payload = {
@@ -121,10 +138,8 @@ export const ChatWidget = () => {
       });
       if (!response.ok) throw new Error('Falha na resposta do Worker AI');
       const data = await response.json();
-      // Espera resposta no formato { response: { choices: [{ message: { content } }] } } ou similar
       let reply = '';
       if (Array.isArray(data)) {
-        // Worker retorna array de tasks
         reply = data[data.length - 1]?.response?.choices?.[0]?.message?.content || data[data.length - 1]?.response?.output || 'Desculpe, não consegui responder.';
       } else {
         reply = data?.response?.choices?.[0]?.message?.content || data?.response?.output || data?.reply || 'Desculpe, não consegui responder.';
@@ -135,6 +150,14 @@ export const ChatWidget = () => {
         timestamp: new Date(),
       };
       setMessages(prev => [...prev, assistantMessage]);
+      // Publica resposta do assistente em realtime.messages
+      await supabase.from('realtime.messages').insert({
+        topic,
+        extension: 'chat',
+        payload: { role: 'assistant', content: reply },
+        event: 'assistant_message',
+        private: false
+      });
     } catch (error) {
       console.error("Chat Error:", error);
       setMessages(prev => [...prev, {
@@ -146,6 +169,32 @@ export const ChatWidget = () => {
       setIsLoading(false);
     }
   };
+  // Assina o canal realtime para receber mensagens do topic
+  useEffect(() => {
+    if (!topic) return;
+    const channel = supabase.channel(`chat:${topic}`)
+      .on('postgres_changes', {
+        event: 'INSERT',
+        schema: 'realtime',
+        table: 'messages',
+        filter: `topic=eq.${topic}`
+      }, (payload) => {
+        const msg = payload.new;
+        if (!msg || !msg.payload) return;
+        setMessages(prev => ([
+          ...prev,
+          {
+            role: msg.payload.role,
+            content: msg.payload.content,
+            timestamp: new Date(msg.inserted_at || Date.now())
+          }
+        ]));
+      });
+    channel.subscribe();
+    return () => {
+      channel.unsubscribe();
+    };
+  }, [topic]);
 
   return (
     <div className="fixed bottom-6 right-6 z-[100] flex flex-col items-end">

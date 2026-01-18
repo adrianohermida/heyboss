@@ -211,9 +211,9 @@ const ClientPortal: React.FC = () => {
       }
       // Adjust the filter below to match your schema (e.g., user_id or email)
       const { data, error } = await supabase
-        .from('faturas')
+        .from('crm.faturas')
         .select('*')
-        .eq('user_id', user.id)
+        .eq('cliente_id', clienteId)
         .order('data_vencimento', { ascending: false });
       if (error) {
         setFaturas([]);
@@ -248,8 +248,8 @@ const ClientPortal: React.FC = () => {
                       schema={allConfigs['documentos_plano_form'].jsonSchema}
                       onSubmit={async (data) => {
                         const { error } = await supabase
-                          .from('documentos')
-                          .insert([{ form_data: { ...data, email: user?.email }, user_id: user?.id }]);
+                          .from('crm.documentos')
+                          .insert([{ form_data: { ...data, email: user?.email }, cliente_id: clienteId }]);
                         if (!error) {
                           alert('Documento enviado com sucesso!');
                           fetchDocumentos();
@@ -305,9 +305,9 @@ const ClientPortal: React.FC = () => {
       return;
     }
     const { data, error } = await supabase
-      .from('documentos')
+      .from('crm.documentos')
       .select('*')
-      .eq('user_id', user.id)
+      .eq('cliente_id', clienteId)
       .order('created_at', { ascending: false });
     if (error) {
       setDocumentos([]);
@@ -454,7 +454,7 @@ const ClientPortal: React.FC = () => {
                                 onClick={async () => {
                                   if (confirm('Deseja realmente cancelar este agendamento?')) {
                                     const { error } = await supabase
-                                      .from('appointments')
+                                      .from('crm.appointments')
                                       .update({ status: 'cancelado' })
                                       .eq('id', app.id);
                                     if (!error) {
@@ -487,7 +487,7 @@ const ClientPortal: React.FC = () => {
       return;
     }
     const { data, error } = await supabase
-      .from('appointments')
+      .from('crm.appointments')
       .select('*')
       .eq('user_id', user.id)
       .order('created_at', { ascending: false });
@@ -524,15 +524,16 @@ const TicketsModule = () => {
   // Fetch tickets from Supabase
   const fetchTickets = async () => {
     setLoading(true);
-    if (!user) {
+    if (!clienteId) {
       setTickets([]);
       setLoading(false);
       return;
     }
+    // Busca tickets do schema real, filtrando por cliente_id
     const { data, error } = await supabase
-      .from('tickets')
-      .select('*')
-      .eq('user_id', user.id)
+      .from('tickets.tickets')
+      .select('id, titulo, descricao, status, prioridade, canal, created_at, updated_at, closed_at')
+      .eq('cliente_id', clienteId)
       .order('updated_at', { ascending: false });
     if (error) {
       setTickets([]);
@@ -542,11 +543,11 @@ const TicketsModule = () => {
     setLoading(false);
   };
 
-  // Fetch messages for a ticket from Supabase
-  const fetchMessages = async (id: number) => {
+  // Fetch comments for a ticket from Supabase (schema real)
+  const fetchMessages = async (id: string) => {
     const { data, error } = await supabase
-      .from('ticket_threads')
-      .select('*')
+      .from('tickets.ticket_comments')
+      .select('id, ticket_id, autor_id, autor_tipo, mensagem, created_at')
       .eq('ticket_id', id)
       .order('created_at', { ascending: true });
     if (error) {
@@ -568,14 +569,19 @@ const TicketsModule = () => {
     }
   }, [selectedTicket]);
 
-  // Send reply to ticket (insert into ticket_threads)
+  // Send reply to ticket (insert into tickets.ticket_comments)
   const handleSendReply = async () => {
     if (!reply.trim() || sendingReply) return;
     setSendingReply(true);
     try {
       const { error } = await supabase
-        .from('ticket_threads')
-        .insert([{ ticket_id: selectedTicket.id, message: reply, is_admin: false, user_id: user.id }]);
+        .from('tickets.ticket_comments')
+        .insert([{
+          ticket_id: selectedTicket.id,
+          autor_id: clienteId,
+          autor_tipo: 'cliente',
+          mensagem: reply
+        }]);
       if (!error) {
         setReply("");
         fetchMessages(selectedTicket.id);
@@ -588,6 +594,8 @@ const TicketsModule = () => {
   };
 
   if (selectedTicket) {
+    // Integração direta: topicOverride = ticket:{ticket_id}
+    const ChatWidget = require('../components/ChatWidget').ChatWidget;
     return (
       <div className="space-y-6 animate-fade-in">
         <div className="flex items-center justify-between gap-4">
@@ -599,79 +607,23 @@ const TicketsModule = () => {
               <X size={24} />
             </button>
             <div>
-              <h2 className="text-2xl font-extrabold">{selectedTicket.subject}</h2>
+              <h2 className="text-2xl font-extrabold">{selectedTicket.titulo}</h2>
               <div className="flex items-center gap-3 mt-1">
                 <p className="text-white/40 text-xs uppercase font-bold tracking-widest">Ticket #{selectedTicket.id}</p>
                 <span className={clsx(
                   "text-[9px] font-bold uppercase px-2 py-0.5 rounded-md",
-                  selectedTicket.status === 'Fechado' ? "bg-green-500/10 text-green-400" : "bg-brand-primary/10 text-brand-primary"
+                  selectedTicket.status === 'fechado' ? "bg-green-500/10 text-green-400" : "bg-brand-primary/10 text-brand-primary"
                 )}>{selectedTicket.status}</span>
-                {selectedTicket.priority === 'Alta' && (
+                {selectedTicket.prioridade === 'Alta' && (
                   <span className="bg-red-500/10 text-red-400 text-[9px] font-bold uppercase px-2 py-0.5 rounded-md">Urgente</span>
                 )}
               </div>
             </div>
           </div>
-          
-            {/* Removido: exportação de conversa via endpoint inexistente */}
         </div>
-
-        <div className="bg-brand-elevated rounded-[2.5rem] border border-white/5 flex flex-col h-[600px] overflow-hidden shadow-2xl relative">
-          <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-brand-primary/20 via-brand-primary to-brand-primary/20 opacity-30" />
-          
-          <div className="flex-1 overflow-y-auto p-8 space-y-8 scrollbar-hide">
-            {messages.length === 0 ? (
-              <div className="flex flex-col items-center justify-center h-full text-white/20 space-y-4">
-                <MessageSquare size={48} />
-                <p className="font-medium italic">Carregando histórico de mensagens...</p>
-              </div>
-            ) : (
-              messages.map((msg, i) => (
-                <div key={i} className={clsx("flex flex-col", msg.is_admin ? "items-start" : "items-end")}>
-                  <div className={clsx(
-                    "max-w-[85%] p-6 rounded-3xl text-sm leading-relaxed shadow-xl transition-all hover:scale-[1.01]",
-                    msg.is_admin 
-                      ? "bg-white/5 border border-white/10 text-white/90 rounded-tl-none" 
-                      : "bg-brand-primary text-white rounded-tr-none shadow-brand-primary/10"
-                  )}>
-                    {msg.message}
-                  </div>
-                  <div className="flex items-center gap-2 mt-3 px-2">
-                    {msg.is_admin && <ShieldCheck size={12} className="text-brand-primary" />}
-                    <span className="text-[10px] text-white/20 font-bold uppercase tracking-wider">
-                      {msg.is_admin ? "Equipe Hermida Maia" : "Você"} • {new Date(msg.created_at).toLocaleString('pt-BR', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' })}
-                    </span>
-                  </div>
-                </div>
-              ))
-            )}
-          </div>
-
-          <div className="p-6 border-t border-white/10 bg-brand-dark/50 backdrop-blur-md">
-            {selectedTicket.status === 'Fechado' ? (
-              <div className="bg-white/5 p-4 rounded-2xl text-center border border-white/10">
-                <p className="text-white/40 text-xs font-bold uppercase tracking-widest">Este chamado foi encerrado. Envie uma mensagem para reabri-lo.</p>
-              </div>
-            ) : null}
-            <div className="relative mt-2">
-              <textarea 
-                value={reply}
-                onChange={(e) => setReply(e.target.value)}
-                placeholder="Digite sua resposta aqui..."
-                className="w-full bg-brand-dark border border-white/10 rounded-2xl py-5 pl-6 pr-20 text-sm text-white outline-none focus:border-brand-primary transition-all resize-none min-h-[120px] shadow-inner placeholder:text-white/20"
-              />
-              <div className="absolute right-4 bottom-4 flex items-center gap-2">
-                <button 
-                  onClick={handleSendReply}
-                  disabled={!reply.trim() || sendingReply}
-                  className="p-4 bg-brand-primary text-white rounded-2xl hover:bg-brand-primary/90 disabled:opacity-30 transition-all shadow-lg shadow-brand-primary/20 group"
-                >
-                  {sendingReply ? <Loader2 className="animate-spin" size={24} /> : <Send size={24} className="group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform" />}
-                </button>
-              </div>
-            </div>
-            <p className="text-[9px] text-white/20 mt-4 text-center uppercase font-bold tracking-widest">Sua conversa é protegida por criptografia e auditada para conformidade LGPD.</p>
-          </div>
+        {/* ChatWidget integrado ao ticket */}
+        <div className="mt-4">
+          <ChatWidget topicOverride={`ticket:${selectedTicket.id}`} initialOpen={true} />
         </div>
       </div>
     );
@@ -696,34 +648,35 @@ const TicketsModule = () => {
         <div className="grid gap-4">
           {tickets.map((ticket, idx) => (
             <button 
-              key={idx}
+              key={ticket.id}
               onClick={() => setSelectedTicket(ticket)}
               className="bg-brand-elevated p-6 rounded-3xl border border-white/5 flex flex-col sm:flex-row items-center justify-between gap-6 hover:border-brand-primary/30 transition-all text-left group shadow-lg"
             >
               <div className="flex items-center gap-4 w-full sm:w-auto">
                 <div className={clsx(
                   "w-14 h-14 rounded-2xl flex items-center justify-center shadow-inner",
-                  ticket.status === 'Fechado' ? "bg-green-500/10 text-green-400" : "bg-brand-primary/10 text-brand-primary"
+                  ticket.status === 'fechado' ? "bg-green-500/10 text-green-400" : "bg-brand-primary/10 text-brand-primary"
                 )}>
                   <MessageSquare size={28} />
                 </div>
                 <div>
-                  <p className="font-bold text-lg group-hover:text-brand-primary transition-colors">{ticket.subject}</p>
-                  <p className="text-white/40 text-xs">Última atualização: {new Date(ticket.updated_at).toLocaleDateString('pt-BR')}</p>
+                  <p className="font-bold text-lg group-hover:text-brand-primary transition-colors">{ticket.titulo}</p>
+                  <p className="text-white/40 text-xs">Última atualização: {ticket.updated_at ? new Date(ticket.updated_at).toLocaleDateString('pt-BR') : '-'}</p>
+                  <p className="text-white/20 text-xs mt-1 line-clamp-2">{ticket.descricao}</p>
                 </div>
               </div>
 
               <div className="flex items-center gap-3 w-full sm:w-auto justify-between sm:justify-end">
                 <span className={clsx(
                   "text-[10px] font-bold uppercase px-3 py-1 rounded-full",
-                  ticket.priority === 'Alta' ? "bg-red-500/10 text-red-400" : "bg-white/5 text-white/40"
+                  ticket.prioridade === 'Alta' ? "bg-red-500/10 text-red-400" : "bg-white/5 text-white/40"
                 )}>
-                  {ticket.priority}
+                  {ticket.prioridade}
                 </span>
                 <span className={clsx(
                   "text-[10px] font-bold uppercase px-3 py-1 rounded-full",
-                  ticket.status === 'Aberto' ? "bg-brand-primary/10 text-brand-primary" : 
-                  ticket.status === 'Em Atendimento' ? "bg-yellow-500/10 text-yellow-400" : "bg-green-500/10 text-green-400"
+                  ticket.status === 'aberto' ? "bg-brand-primary/10 text-brand-primary" : 
+                  ticket.status === 'em_atendimento' ? "bg-yellow-500/10 text-yellow-400" : "bg-green-500/10 text-green-400"
                 )}>
                   {ticket.status}
                 </span>
