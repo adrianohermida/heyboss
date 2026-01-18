@@ -5,6 +5,8 @@
  */
 
 import React, { useState, useEffect } from 'react';
+import { useTheme } from '../../styles/ThemeProvider';
+import clsx from 'clsx';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { supabase } from '../../supabaseClient';
 import { 
@@ -69,11 +71,19 @@ const BlogPostPage = () => {
     }
   };
 
+  const { mode } = useTheme();
   if (loading) {
     return (
-      <div className="min-h-screen bg-brand-dark flex flex-col items-center justify-center gap-4">
+      <div
+        className={clsx(
+          'min-h-screen flex flex-col items-center justify-center gap-4',
+          mode === 'clear'
+            ? 'bg-white text-gray-900'
+            : 'bg-brand-dark text-white'
+        )}
+      >
         <Loader2 className="text-brand-primary animate-spin" size={48} />
-        <p className="text-white/40 font-medium">Carregando artigo...</p>
+        <p className={clsx(mode === 'clear' ? 'text-gray-400' : 'text-white/40', 'font-medium')}>Carregando artigo...</p>
       </div>
     );
   }
@@ -82,7 +92,14 @@ const BlogPostPage = () => {
 
   return (
     <>
-      <div className="min-h-screen bg-brand-dark text-white selection:bg-brand-primary selection:text-white">
+      <div
+        className={clsx(
+          'min-h-screen selection:bg-brand-primary selection:text-white',
+          mode === 'clear'
+            ? 'bg-white text-gray-900'
+            : 'bg-brand-dark text-white'
+        )}
+      >
         <Header />
 
         <main className="pt-32 pb-24">
@@ -96,7 +113,7 @@ const BlogPostPage = () => {
                 {post.titulo}
               </h1>
               
-              <div className="flex flex-wrap items-center justify-center gap-6 text-white/50 text-sm font-medium">
+              <div className={clsx('flex flex-wrap items-center justify-center gap-6 text-sm font-medium', mode === 'clear' ? 'text-gray-500' : 'text-white/50')}>
                 <div className="flex items-center gap-2">
                   <Calendar size={16} className="text-brand-primary" />
                   {new Date(post.data_publicacao || post.created_at).toLocaleDateString('pt-BR')}
@@ -109,7 +126,7 @@ const BlogPostPage = () => {
             </header>
 
             {/* Featured Image */}
-            <div className="mb-16 rounded-[2.5rem] overflow-hidden border border-white/10 shadow-2xl">
+            <div className={clsx('mb-16 rounded-[2.5rem] overflow-hidden border shadow-2xl', mode === 'clear' ? 'border-gray-200' : 'border-white/10')}>
               <img 
                 src={post.imagem_capa_url || 'https://heyboss.heeyo.ai/gemini-image-c5df3e56df0a49fdb468a4708ef7c8a8.png'} 
                 alt={`Imagem de capa do artigo: ${post.titulo} - Dr. Adriano Hermida Maia`} 
@@ -118,27 +135,21 @@ const BlogPostPage = () => {
             </div>
 
             {/* Content */}
-            <div className="prose prose-invert prose-brand max-w-none mb-16">
+            <div className={clsx('prose max-w-none mb-16', mode === 'clear' ? 'prose-brand' : 'prose-invert prose-brand')}>
               <div 
-                className="text-white/80 text-lg leading-relaxed space-y-6 blog-content"
+                className={clsx('text-lg leading-relaxed space-y-6 blog-content', mode === 'clear' ? 'text-gray-800' : 'text-white/80')}
                 dangerouslySetInnerHTML={{ __html: post.conteudo }}
               />
             </div>
 
             {/* Share & CTA */}
-            <div className="border-t border-white/10 pt-12 flex flex-col sm:flex-row items-center justify-between gap-8">
+            <div className={clsx('pt-12 flex flex-col sm:flex-row items-center justify-between gap-8 border-t', mode === 'clear' ? 'border-gray-200' : 'border-white/10')}>
               <div className="flex items-center gap-4">
-                <span className="text-white/40 text-sm font-bold uppercase tracking-widest">Compartilhar:</span>
+                <span className={clsx('text-sm font-bold uppercase tracking-widest', mode === 'clear' ? 'text-gray-400' : 'text-white/40')}>Compartilhar:</span>
                 <div className="flex gap-3">
-                  <button className="w-10 h-10 bg-brand-elevated rounded-xl flex items-center justify-center text-white/60 hover:text-brand-primary hover:bg-brand-primary/10 transition-all">
-                    <Facebook size={18} />
-                  </button>
-                  <button className="w-10 h-10 bg-brand-elevated rounded-xl flex items-center justify-center text-white/60 hover:text-brand-primary hover:bg-brand-primary/10 transition-all">
-                    <Twitter size={18} />
-                  </button>
-                  <button className="w-10 h-10 bg-brand-elevated rounded-xl flex items-center justify-center text-white/60 hover:text-brand-primary hover:bg-brand-primary/10 transition-all">
-                    <Linkedin size={18} />
-                  </button>
+                  <button className={clsx('w-10 h-10 rounded-xl flex items-center justify-center transition-all', mode === 'clear' ? 'bg-gray-100 text-gray-500 hover:text-brand-primary hover:bg-brand-primary/10' : 'bg-brand-elevated text-white/60 hover:text-brand-primary hover:bg-brand-primary/10')}> <Facebook size={18} /> </button>
+                  <button className={clsx('w-10 h-10 rounded-xl flex items-center justify-center transition-all', mode === 'clear' ? 'bg-gray-100 text-gray-500 hover:text-brand-primary hover:bg-brand-primary/10' : 'bg-brand-elevated text-white/60 hover:text-brand-primary hover:bg-brand-primary/10')}> <Twitter size={18} /> </button>
+                  <button className={clsx('w-10 h-10 rounded-xl flex items-center justify-center transition-all', mode === 'clear' ? 'bg-gray-100 text-gray-500 hover:text-brand-primary hover:bg-brand-primary/10' : 'bg-brand-elevated text-white/60 hover:text-brand-primary hover:bg-brand-primary/10')}> <Linkedin size={18} /> </button>
                 </div>
               </div>
 
@@ -156,20 +167,20 @@ const BlogPostPage = () => {
 
           {/* Related Posts */}
           {post.related_posts && post.related_posts.length > 0 && (
-            <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-24 pt-24 border-t border-white/5">
-              <h2 className="text-3xl font-bold text-white mb-12 text-center">Artigos Relacionados</h2>
+            <section className={clsx('max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-24 pt-24 border-t', mode === 'clear' ? 'border-gray-100' : 'border-white/5')}>
+              <h2 className={clsx('text-3xl font-bold mb-12 text-center', mode === 'clear' ? 'text-gray-900' : 'text-white')}>Artigos Relacionados</h2>
               <div className="grid md:grid-cols-3 gap-8">
                 {post.related_posts.map((rel: any) => (
                   <Link 
                     key={rel.id} 
                     to={`/blog/${rel.slug}`}
-                    className="bg-brand-elevated rounded-3xl overflow-hidden border border-white/5 group hover:border-brand-primary/30 transition-all"
+                    className={clsx('rounded-3xl overflow-hidden border group transition-all', mode === 'clear' ? 'bg-white border-gray-100 hover:border-brand-primary/30' : 'bg-brand-elevated border-white/5 hover:border-brand-primary/30')}
                   >
                     <div className="aspect-video overflow-hidden">
                       <img src={rel.imagem_capa_url} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" alt={rel.titulo} />
                     </div>
                     <div className="p-6">
-                      <h3 className="text-lg font-bold text-white group-hover:text-brand-primary transition-colors line-clamp-2">{rel.titulo}</h3>
+                      <h3 className={clsx('text-lg font-bold group-hover:text-brand-primary transition-colors line-clamp-2', mode === 'clear' ? 'text-gray-900' : 'text-white')}>{rel.titulo}</h3>
                       <div className="mt-4 text-brand-primary font-bold text-sm flex items-center gap-2">
                         Ler mais <ArrowRight size={16} />
                       </div>
@@ -204,9 +215,9 @@ const BlogPostPage = () => {
           </section>
         </main>
 
-        <footer className="bg-brand-dark py-12 border-t border-white/5">
-          <div className="max-w-7xl mx-auto px-4 text-center">
-            <p className="text-white/20 text-xs">
+        <footer className={clsx('py-12 border-t text-center', mode === 'clear' ? 'bg-white border-gray-100' : 'bg-brand-dark border-white/5')}> 
+          <div className="max-w-7xl mx-auto px-4">
+            <p className={clsx('text-xs', mode === 'clear' ? 'text-gray-300' : 'text-white/20')}>
               © 2024 Hermida Maia Advocacia. Todos os direitos reservados.
             </p>
           </div>
@@ -216,14 +227,14 @@ const BlogPostPage = () => {
           .blog-content h2 {
             font-size: 1.875rem;
             font-weight: 800;
-            color: white;
+            color: ${mode === 'clear' ? '#1a1a1a' : 'white'};
             margin-top: 2.5rem;
             margin-bottom: 1.25rem;
           }
           .blog-content h3 {
             font-size: 1.5rem;
             font-weight: 700;
-            color: white;
+            color: ${mode === 'clear' ? '#1a1a1a' : 'white'};
             margin-top: 2rem;
             margin-bottom: 1rem;
           }

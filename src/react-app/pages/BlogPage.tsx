@@ -1,5 +1,6 @@
 
 import React, { useState, useEffect } from 'react';
+
 import Header from '../components/Header';
 import Footer from '../components/Footer';
 import ScrollToTopButton from '../components/ScrollToTopButton';
@@ -9,6 +10,8 @@ import BlogPostCard from '../components/Blog/BlogPostCard';
 import BlogSkeleton from '../components/Blog/BlogSkeleton';
 import BlogNoResults from '../components/Blog/BlogNoResults';
 import { supabase } from '../../supabaseClient';
+import { useTheme } from '../../styles/ThemeProvider';
+import clsx from 'clsx';
 
 // Manifesto da página Blog
 // - Modular: cada seção é um componente
@@ -18,6 +21,7 @@ import { supabase } from '../../supabaseClient';
 // - Responsivo, acessível, mobile-first, tokenização CSS
 
 const BlogPage2: React.FC = () => {
+  const { mode } = useTheme();
   const [posts, setPosts] = useState<any[]>([]);
   const [categories, setCategories] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
@@ -55,7 +59,14 @@ const BlogPage2: React.FC = () => {
   );
 
   return (
-    <div className="min-h-screen bg-brand-dark text-white selection:bg-brand-primary selection:text-white">
+    <div
+      className={clsx(
+        'min-h-screen selection:bg-brand-primary selection:text-white',
+        mode === 'clear'
+          ? 'bg-white text-gray-900'
+          : 'bg-brand-dark text-white'
+      )}
+    >
       <Header />
       <main className="pb-24">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
