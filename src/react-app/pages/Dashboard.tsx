@@ -24,12 +24,6 @@ import { BlogManagementModule } from '../components/BlogManagement/BlogManagemen
 import { PublicacoesModule } from '../components/Publicacoes/PublicacoesModule';
 import clsx from 'clsx';
 import { CreditCard, Download, Search, MessageSquare, ChevronRight, Bot, Zap, CheckCircle2, Clock, AlertCircle, Calendar, Settings, Chrome, Loader2 } from 'lucide-react';
-// Add missing tab modules used by the dashboard
-import { PublicacoesModule } from '../components/Publicacoes/PublicacoesModule';
-import { AIMonitoringModule } from '../components/AIMonitoring/AIMonitoringModule';
-import { BalcaoVirtualModule } from '../components/BalcaoVirtual/BalcaoVirtualModule';
-import { ChatbotConfigModule } from '../components/ChatbotConfigModule';
-import { BlogManagementModule } from '../components/BlogManagement/BlogManagementModule';
 
 const Dashboard: React.FC = () => {
   // ...hooks e lógica modular aqui...
@@ -59,18 +53,12 @@ const Dashboard: React.FC = () => {
                 {activeTab === 'faturas' && <FaturasModule data={filteredData} />}
                 {activeTab === 'tickets' && <TicketsModule data={filteredData} />}
                 {activeTab === 'publicacoes' && <PublicacoesModule />}
-                {activeTab === 'ai' && <IAModule data={filteredData} />}
+                {activeTab === 'ai' && <AIMonitoringModule data={filteredData} />}
                 {activeTab === 'chatbot' && <ChatbotConfigModule />}
                 {activeTab === 'balcao' && <BalcaoVirtualModule />}
                 {activeTab === 'blog' && <BlogManagementModule />}
                 {activeTab === 'agenda' && <AdminAgendaModule />}
                 {activeTab === 'overview' && <OverviewModule />}
-                {activeTab === 'publicacoes' && <PublicacoesModule />}
-                {activeTab === 'ai' && <AIMonitoringModule />}
-                {activeTab === 'balcao' && <BalcaoVirtualModule />}
-                {activeTab === 'chatbot' && <ChatbotConfigModule />}
-                {activeTab === 'blog' && <BlogManagementModule />}
-                {activeTab === 'agenda' && <AdminAgendaModule />}
                 {activeTab === 'config' && <ConfigModule />}
               </div>
             )}
