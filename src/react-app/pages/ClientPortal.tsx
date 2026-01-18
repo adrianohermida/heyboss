@@ -200,30 +200,39 @@ const ClientPortal: React.FC = () => {
                 )}
               </div>
             )}
-  // Fetch faturas from Supabase on mount or when user changes
-  useEffect(() => {
-    const fetchFaturas = async () => {
-      setLoadingFaturas(true);
-      if (!user) {
-        setFaturas([]);
-        setLoadingFaturas(false);
-        return;
-      }
-      // Adjust the filter below to match your schema (e.g., user_id or email)
-      const { data, error } = await supabase
-        .from('crm.faturas')
-        .select('*')
-        .eq('cliente_id', clienteId)
-        .order('data_vencimento', { ascending: false });
-      if (error) {
-        setFaturas([]);
-      } else {
-        setFaturas(data || []);
-      }
+            {/* ...outros módulos... */}
+          </div>
+        </div>
+      </main>
+    </div>
+  );
+}
+
+// Fetch faturas from Supabase on mount or when user changes
+// (Agora corretamente fora do JSX e dentro do componente)
+useEffect(() => {
+  const fetchFaturas = async () => {
+    setLoadingFaturas(true);
+    if (!user) {
+      setFaturas([]);
       setLoadingFaturas(false);
-    };
-    fetchFaturas();
-  }, [user]);
+      return;
+    }
+    // Adjust the filter below to match your schema (e.g., user_id or email)
+    const { data, error } = await supabase
+      .from('crm.faturas')
+      .select('*')
+      .eq('cliente_id', clienteId)
+      .order('data_vencimento', { ascending: false });
+    if (error) {
+      setFaturas([]);
+    } else {
+      setFaturas(data || []);
+    }
+    setLoadingFaturas(false);
+  };
+  fetchFaturas();
+}, [user]);
 
             {activeTab === 'documentos' && (
               <div className="space-y-6 animate-fade-in">

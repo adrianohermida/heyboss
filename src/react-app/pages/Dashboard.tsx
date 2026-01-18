@@ -552,15 +552,4 @@ const ConfigModule = () => {
 
 export default Dashboard;
 
-// Buscar compromissos do usuário autenticado
-const { data, error } = await supabase
-  .from('appointments')
-  .select('*')
-  .eq('user_id', supaUser.id);
-
-// Atualizar status do compromisso
-const { error } = await supabase
-  .from('appointments')
-  .update({ status, notes })
-  .eq('id', id);
 
