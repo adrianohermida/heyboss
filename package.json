@@ -1,1 +1,1 @@
-{"scripts":{"build":"vite build","deploy":"wrangler deploy --env production"},"devDependencies":{"@vitejs/plugin-react":"^5.1.2","vite":"^7.3.1"}}
+{"scripts":{"build":"vite build","deploy":"wrangler deploy --env production"},"devDependencies":{"@vitejs/plugin-react":"^5.1.2","vite":"^7.3.1"},"dependencies":{"clsx":"^2.1.1","lucide-react":"^0.562.0","react":"^19.2.3","react-dom":"^19.2.3","react-router-dom":"^7.12.0"}}
