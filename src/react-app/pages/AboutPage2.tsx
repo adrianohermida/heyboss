@@ -24,7 +24,14 @@ const AboutPage2: React.FC = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-brand-dark">
+      <div
+        className={
+          `min-h-screen flex items-center justify-center ` +
+          (mode === 'clear'
+            ? 'bg-white text-gray-900'
+            : 'bg-brand-dark text-white')
+        }
+      >
         <div className="animate-pulse w-16 h-16 rounded-full bg-brand-primary/30" aria-label="Carregando..." />
       </div>
     );
@@ -32,7 +39,14 @@ const AboutPage2: React.FC = () => {
 
   return (
     <>
-      <div className={`min-h-screen ${mode === 'clear' ? 'bg-brand-dark text-white' : 'bg-brand-dark text-white'} selection:bg-brand-primary selection:text-white`}>
+      <div
+        className={
+          `min-h-screen selection:bg-brand-primary selection:text-white ` +
+          (mode === 'clear'
+            ? 'bg-white text-gray-900'
+            : 'bg-brand-dark text-white')
+        }
+      >
         <Header />
         <main>
           <AboutHero />
