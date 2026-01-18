@@ -32,14 +32,26 @@ const LoginForm = () => {
           autoComplete="current-password"
         />
       </div>
-      {error && <div className="bg-red-500/10 border border-red-500/20 text-red-400 px-4 py-3 rounded-xl text-sm text-center">{error}</div>}
+      {error && (
+        <div className="bg-red-500/20 border border-red-500/40 text-red-500 px-4 py-3 rounded-xl text-sm text-center font-semibold animate-pulse">
+          {error}
+        </div>
+      )}
       <button
         type="submit"
         disabled={loading}
-        className="w-full bg-brand-primary hover:bg-brand-primary/90 text-white py-4 rounded-xl font-bold flex items-center justify-center gap-2 transition-all active:scale-95 disabled:opacity-50"
+        className={`w-full bg-brand-primary hover:bg-brand-primary/90 text-white py-4 rounded-xl font-bold flex items-center justify-center gap-2 transition-all active:scale-95 disabled:opacity-50 ${loading ? 'cursor-not-allowed opacity-60' : ''}`}
         aria-busy={loading}
+        tabIndex={loading ? -1 : 0}
       >
-        {loading ? <Loader2 className="animate-spin" size={20} /> : <span className="flex items-center gap-2"><LogIn size={18} /> Entrar</span>}
+        {loading ? (
+          <>
+            <Loader2 className="animate-spin" size={20} />
+            <span className="ml-2">Entrando...</span>
+          </>
+        ) : (
+          <span className="flex items-center gap-2"><LogIn size={18} /> Entrar</span>
+        )}
       </button>
     </form>
   );
