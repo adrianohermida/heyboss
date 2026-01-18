@@ -17,6 +17,17 @@ const VideoJourney: React.FC = () => {
   const text = mode === 'clear' ? 'text-gray-900' : 'text-white';
   const textSub = mode === 'clear' ? 'text-brand-dark/60' : 'text-white/60';
   const cardBg = mode === 'clear' ? 'bg-white border border-gray-200' : 'bg-brand-elevated border border-white/10';
+
+  // Fix: Add state for currentStep and completed
+  const [currentStep, setCurrentStep] = React.useState(0);
+  const completed = currentStep >= videos.length;
+
+  const handleNext = () => {
+    if (currentStep < videos.length) {
+      setCurrentStep(currentStep + 1);
+    }
+  };
+
   return (
     <section id="video-section" className={`py-24 ${bg} relative overflow-hidden`}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
