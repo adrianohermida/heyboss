@@ -7,7 +7,7 @@ export default defineConfig({
   build: {
     chunkSizeWarningLimit: 10240,
     rollupOptions: {
-      external: ['stripe', 'jose'],
+      external: ['stripe'],
       output: {
         globals: {
           stripe: 'Stripe',
