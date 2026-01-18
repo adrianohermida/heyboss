@@ -4,6 +4,7 @@ import ClientPortalPlano from '../components/ClientPortal/ClientPortalPlano';
 import ClientPortalDocumentos from '../components/ClientPortal/ClientPortalDocumentos';
 import ClientPortalProcessos from '../components/ClientPortal/ClientPortalProcessos';
 import React, { useState, useEffect } from 'react';
+import { useTheme } from '../../styles/ThemeProvider';
 import { AlertCircle, Wallet, MessageSquare, ChevronRight, X, Calendar as CalendarIcon, Loader2, Scale, CheckCircle2, Clock, CreditCard, Download, Plus, FileText, ExternalLink } from 'lucide-react';
 import clsx from 'clsx';
 import { Link } from 'react-router-dom';
@@ -20,6 +21,7 @@ import ClientPortalFaturas from '../components/ClientPortal/ClientPortalFaturas'
 
 
 const ClientPortal: React.FC = () => {
+  const { mode } = useTheme();
   // --- HOOKS E ESTADO ---
   const { user } = useAuth();
   const [activeTab, setActiveTab] = useState('overview');
@@ -136,12 +138,25 @@ const ClientPortal: React.FC = () => {
 
   // --- RENDER ---
   return (
-    <div className="min-h-screen bg-brand-dark text-white selection:bg-brand-primary selection:text-white">
+    <div
+      className={clsx(
+        'min-h-screen selection:bg-brand-primary selection:text-white',
+        mode === 'clear'
+          ? 'bg-white text-gray-900'
+          : 'bg-brand-dark text-white'
+      )}
+    >
       <Header />
-      <main className="pt-32 pb-20 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
+      <main className={clsx(
+        'pt-32 pb-20 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto',
+        mode === 'clear' ? '' : ''
+      )}>
         <div className="flex flex-col lg:flex-row gap-8">
           <ClientPortalSidebar user={user} activeTab={activeTab} setActiveTab={setActiveTab} exporting={false} onExport={undefined} />
-          <div className="flex-1 min-w-0 space-y-8">
+          <div className={clsx(
+            'flex-1 min-w-0 space-y-8',
+            mode === 'clear' ? '' : ''
+          )}>
             {activeTab === 'overview' && <ClientPortalOverview user={user} summary={summary} setActiveTab={setActiveTab} />}
             {/* Adicione aqui os módulos: processos, tickets, financeiro, documentos, plano, agenda, etc. */}
             {activeTab === 'financeiro' && <ClientPortalFaturas />}
