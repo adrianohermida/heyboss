@@ -1,159 +1,154 @@
-
-// ------------------- IMPORTS -------------------
+import ClientPortalProcessos from '../components/ClientPortal/ClientPortalProcessos';
 import React, { useState, useEffect } from 'react';
 import { AlertCircle, Wallet, MessageSquare, ChevronRight, X, Calendar as CalendarIcon, Loader2, Scale, CheckCircle2, Clock, CreditCard, Download, Plus, FileText, ExternalLink } from 'lucide-react';
+import clsx from 'clsx';
+import { Link } from 'react-router-dom';
+import allConfigs from '../../shared/form-configs.json';
+import { CustomForm } from '../components/CustomForm/CustomForm';
+import { contactFormTheme } from '../components/CustomForm/themes';
+import { useAuth } from '../auth/supabaseAuth';
+import { supabase } from '../../supabaseClient';
+import ClientPortalSidebar from '../components/ClientPortal/ClientPortalSidebar';
+import ClientPortalOverview from '../components/ClientPortal/ClientPortalOverview';
+import Header from '../components/Header';
+import TicketsModule from '../components/Dashboard/TicketsModule';
+import ClientPortalFaturas from '../components/ClientPortal/ClientPortalFaturas';
 
-                    {planos.map((plano, idx) => (
-                      <div key={idx} className="bg-brand-elevated p-8 rounded-[2.5rem] border border-white/5 shadow-2xl relative overflow-hidden">
-                        <div className="absolute top-0 right-0 w-64 h-64 bg-brand-accent/5 rounded-full blur-3xl -mr-32 -mt-32" />
-                        <div className="relative z-10 space-y-6">
-                          <div className="flex items-center justify-between">
-                            <div className="space-y-1">
-                              <h3 className="text-2xl font-extrabold">Plano de Repactuação #{plano.id}</h3>
-                              <p className="text-white/40 text-sm">Criado em: {new Date(plano.created_at).toLocaleDateString('pt-BR')}</p>
-                            </div>
-                            <span className={clsx(
-                              "text-[10px] font-bold uppercase px-4 py-2 rounded-full shadow-lg",
-                              plano.status === 'Ativo' ? "bg-green-500/10 text-green-400" : "bg-brand-accent/10 text-brand-accent"
-                            )}>
-                              {plano.status}
-                            </span>
-                          </div>
+const ClientPortal: React.FC = () => {
+  // --- HOOKS E ESTADO ---
+  const { user } = useAuth();
+  const [activeTab, setActiveTab] = useState('overview');
+  const [summary, setSummary] = useState({ processos: 0, faturas: 0, tickets: 0, appointments: 0 });
+  // const [faturas, setFaturas] = useState<any[]>([]);
+  // const [loadingFaturas, setLoadingFaturas] = useState(true);
+  const [documentos, setDocumentos] = useState<any[]>([]);
+  const [loadingDocumentos, setLoadingDocumentos] = useState(true);
+  const [appointments, setAppointments] = useState<any[]>([]);
+  const [loadingAppointments, setLoadingAppointments] = useState(true);
+  // const [processos, setProcessos] = useState<any[]>([]);
+  // const [loadingProcessos, setLoadingProcessos] = useState(true);
+  const [planos, setPlanos] = useState<any[]>([]);
+  const [loadingPlanos, setLoadingPlanos] = useState(true);
+  const [clienteId, setClienteId] = useState<string | null>(null);
+  const [escritorioId, setEscritorioId] = useState<string | null>(null);
+  const [loadingCliente, setLoadingCliente] = useState(true);
 
-                          <div className="grid sm:grid-cols-3 gap-6">
-                            <div className="bg-white/5 p-6 rounded-2xl border border-white/5">
-                              <p className="text-[10px] font-bold text-white/40 uppercase mb-2">Dívida Total</p>
-                              <p className="text-xl font-extrabold">{plano.form_data.totalDebt || 'R$ 0,00'}</p>
-                            </div>
-                            <div className={clsx(
-                              "p-6 rounded-2xl border",
-                              plano.form_data.isSuperendividado ? "bg-red-500/10 border-red-500/20" : "bg-brand-primary/10 border-brand-primary/20"
-                            )}>
-                              <p className="text-[10px] font-bold text-white/40 uppercase mb-2">Comprometimento</p>
-                              <p className={clsx(
-                                "text-xl font-extrabold",
-                                plano.form_data.isSuperendividado ? "text-red-400" : "text-brand-primary"
-                              )}>{plano.form_data.percentage?.toFixed(1)}%</p>
-                            </div>
-                            <div className="bg-white/5 p-6 rounded-2xl border border-white/5">
-                              <p className="text-[10px] font-bold text-white/40 uppercase mb-2">Parcela Atual</p>
-                              <p className="text-xl font-extrabold">{plano.form_data.monthlyInstallment || 'R$ 0,00'}</p>
-                            </div>
-                          </div>
+  // --- EFFECTS E FUNÇÕES AUXILIARES ---
+  useEffect(() => {
+    const fetchCliente = async () => {
+      setLoadingCliente(true);
+      if (!user?.email) {
+        setClienteId(null);
+        setEscritorioId(null);
+        setLoadingCliente(false);
+        return;
+      }
+      const { data, error } = await supabase
+        .from('crm.clientes')
+        .select('id, escritorio_id')
+        .eq('email', user.email)
+        .single();
+      if (data && !error) {
+        setClienteId(data.id);
+        setEscritorioId(data.escritorio_id);
+      } else {
+        setClienteId(null);
+        setEscritorioId(null);
+      }
+      setLoadingCliente(false);
+    };
+    fetchCliente();
+  }, [user]);
 
-                          <div className="bg-brand-dark/50 p-6 rounded-2xl border border-white/5">
-                            <h4 className="font-bold mb-3 flex items-center gap-2">
-                              <AlertCircle size={16} className="text-brand-accent" />
-                              Análise do Especialista
-                            </h4>
-                            <p className="text-sm text-white/60 leading-relaxed">
-                              {plano.form_data.isSuperendividado 
-                                ? "Sua situação se enquadra na Lei do Superendividamento. Estamos trabalhando na proposta de repactuação para reduzir seus juros e garantir seu mínimo existencial."
-                                : "Seu plano está em fase de simulação. Continue acompanhando para atualizações sobre as negociações com os credores."}
-                            </p>
-                          </div>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                ) : (
-                  <div className="bg-brand-elevated p-16 rounded-[2.5rem] border border-white/5 text-center space-y-6 shadow-2xl">
-                    <div className="w-20 h-20 bg-white/5 rounded-full flex items-center justify-center mx-auto text-white/20">
-                      <Wallet size={40} />
-                    </div>
-                    <div className="space-y-4">
-                      <p className="text-white font-bold text-xl">Nenhum plano ativo</p>
-                      <p className="text-white/40 max-w-xs mx-auto">Use nossa calculadora na página inicial para iniciar sua simulação de repactuação de dívidas.</p>
-                      <Link to="/" className="inline-block bg-brand-primary text-white px-8 py-3 rounded-xl font-bold text-sm shadow-lg shadow-brand-primary/20 hover:scale-105 transition-all">
-                        Ir para Calculadora
-                      </Link>
-                    </div>
-                  </div>
-                )}
-              </div>
-            )}
+  // useEffect(() => {
+  //   const fetchFaturas = async () => {
+  //     setLoadingFaturas(true);
+  //     if (!user || !clienteId) {
+  //       setFaturas([]);
+  //       setLoadingFaturas(false);
+  //       return;
+  //     }
+  //     const { data, error } = await supabase
+  //       .from('crm.faturas')
+  //       .select('*')
+  //       .eq('cliente_id', clienteId)
+  //       .order('data_vencimento', { ascending: false });
+  //     if (error) {
+  //       setFaturas([]);
+  //     } else {
+  //       setFaturas(data || []);
+  //     }
+  //     setLoadingFaturas(false);
+  //   };
+  //   fetchFaturas();
+  // }, [user, clienteId]);
 
-            {activeTab === 'agenda' && (
-              <div className="space-y-6 animate-fade-in">
-                <div className="flex justify-between items-center">
-                  <h2 className="text-2xl font-bold text-white">Meus Agendamentos</h2>
-                  <Link to="/agendar" className="bg-brand-primary text-white px-4 py-2 rounded-lg text-sm font-bold">Novo Agendamento</Link>
-                </div>
+  const fetchDocumentos = async () => {
+    setLoadingDocumentos(true);
+    if (!user || !clienteId) {
+      setDocumentos([]);
+      setLoadingDocumentos(false);
+      return;
+    }
+    const { data, error } = await supabase
+      .from('crm.documentos')
+      .select('*')
+      .eq('cliente_id', clienteId)
+      .order('created_at', { ascending: false });
+    if (error) {
+      setDocumentos([]);
+    } else {
+      setDocumentos(data || []);
+    }
+    setLoadingDocumentos(false);
+  };
+  useEffect(() => {
+    fetchDocumentos();
+  }, [user, clienteId]);
 
-                {loadingAppointments ? (
-                  <div className="flex justify-center py-20">
-                    <Loader2 className="animate-spin text-brand-primary" />
-                  </div>
-                ) : (
-                  <div className="grid grid-cols-1 gap-4">
-                    {appointments.length === 0 ? (
-                      <div className="bg-brand-elevated p-12 rounded-3xl border border-white/5 text-center">
-                        <CalendarIcon className="mx-auto text-white/10 mb-4" size={48} />
-                        <p className="text-white/40">Você ainda não possui agendamentos.</p>
-                      </div>
-                    ) : (
-                      appointments.map((app) => (
-                        <div key={app.id} className="bg-brand-elevated p-6 rounded-2xl border border-white/5 flex justify-between items-center">
-                          <div className="flex gap-4">
-                            <div className="bg-brand-primary/10 p-3 rounded-xl h-fit">
-                              <CalendarIcon className="text-brand-primary" size={24} />
-                            </div>
-                            <div>
-                              <h3 className="font-bold text-white">{app.form_data.reason || 'Consulta Jurídica'}</h3>
-                              <p className="text-sm text-white/50">{new Date(app.form_data.appointment_date).toLocaleDateString('pt-BR')} às {app.form_data.appointment_time}</p>
-                              <p className="text-xs text-brand-primary mt-1">Profissional: {app.profissional_nome || 'A definir'}</p>
-                            </div>
-                          </div>
-                          <div className="flex flex-col items-end gap-2">
-                            <span className={clsx(
-                              "text-[10px] font-bold px-3 py-1 rounded-full uppercase tracking-wider",
-                              app.status === 'aguardando_aceite' ? "bg-yellow-500/10 text-yellow-500" :
-                              app.status === 'confirmado' ? "bg-green-500/10 text-green-500" :
-                              app.status === 'recusado' ? "bg-red-500/10 text-red-500" :
-                              "bg-white/5 text-white/40"
-                            )}>
-                              {app.status === 'aguardando_aceite' ? 'Aguardando Aceite' : 
-                               app.status === 'confirmado' ? 'Confirmado' : 
-                               app.status === 'recusado' ? 'Recusado' : 
-                               app.status === 'cancelado' ? 'Cancelado' : 'Concluído'}
-                            </span>
-                            {app.status !== 'cancelado' && app.status !== 'recusado' && (
-                              <button 
-                                onClick={async () => {
-                                  if (confirm('Deseja realmente cancelar este agendamento?')) {
-                                    const { error } = await supabase
-                                      .from('crm.appointments')
-                                      .update({ status: 'cancelado' })
-                                      .eq('id', app.id);
-                                    if (!error) {
-                                      alert('Agendamento cancelado com sucesso.');
-                                      fetchAppointments();
-                                    } else {
-                                      alert(error.message || 'Erro ao cancelar.');
-                                    }
-                                  }
-                                }}
-                                className="text-[10px] font-bold text-red-400 hover:underline uppercase"
-                              >
-                                Cancelar
-                              </button>
-                            )}
-                          </div>
-                        </div>
-                      ))
-                    )}
-                  </div>
-                )}
-              </div>
-            )}
-            {activeTab === 'tickets' && <TicketsModule user={user} clienteId={clienteId} escritorioId={escritorioId} />}
-            {/* ...outros módulos... */}
+  const fetchAppointments = async () => {
+    setLoadingAppointments(true);
+    if (!user) {
+      setAppointments([]);
+      setLoadingAppointments(false);
+      return;
+    }
+    const { data, error } = await supabase
+      .from('crm.appointments')
+      .select('*')
+      .eq('user_id', user.id)
+      .order('created_at', { ascending: false });
+    if (error) {
+      setAppointments([]);
+    } else {
+      setAppointments(data || []);
+    }
+    setLoadingAppointments(false);
+  };
+  useEffect(() => {
+    fetchAppointments();
+  }, [user]);
+
+  // --- RENDER ---
+  return (
+    <div className="min-h-screen bg-brand-dark text-white selection:bg-brand-primary selection:text-white">
+      <Header />
+      <main className="pt-32 pb-20 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
+        <div className="flex flex-col lg:flex-row gap-8">
+          <ClientPortalSidebar user={user} activeTab={activeTab} setActiveTab={setActiveTab} exporting={false} onExport={undefined} />
+          <div className="flex-1 min-w-0 space-y-8">
+            {activeTab === 'overview' && <ClientPortalOverview user={user} summary={summary} setActiveTab={setActiveTab} />}
+            {/* Adicione aqui os módulos: processos, tickets, financeiro, documentos, plano, agenda, etc. */}
+            {activeTab === 'financeiro' && <ClientPortalFaturas />}
+            {activeTab === 'processos' && <ClientPortalProcessos />}
+            {/* {activeTab === 'tickets' && <TicketsModule user={user} clienteId={clienteId} escritorioId={escritorioId} />} */}
           </div>
-
         </div>
       </main>
     </div>
   );
-}
+};
 
 export default ClientPortal;
+
+
