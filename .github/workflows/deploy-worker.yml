@@ -34,12 +34,8 @@ jobs:
 
       - name: Check required secrets
         run: |
-          set -e
-          for secret in CLOUDFLARE_API_TOKEN CLOUDFLARE_ACCOUNT_ID; do
-            if [ -z "${{ secrets[$secret] }}" ]; then
-              echo "Missing secret: $secret"; exit 1;
-            fi
-          done
+          if [ -z "${{ secrets.CLOUDFLARE_API_TOKEN }}" ]; then echo "Missing CLOUDFLARE_API_TOKEN"; exit 1; fi
+          if [ -z "${{ secrets.CLOUDFLARE_ACCOUNT_ID }}" ]; then echo "Missing CLOUDFLARE_ACCOUNT_ID"; exit 1; fi
 
       - name: Deploy to Cloudflare Workers (Production)
         if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master'
