@@ -25,6 +25,9 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      - name: Clean old wrangler deploy configs
+        run: node scripts/clean-wrangler-deploy.js
+
       - name: Build Worker
         run: NODE_OPTIONS=--experimental-vm-modules npm run build:worker
 
