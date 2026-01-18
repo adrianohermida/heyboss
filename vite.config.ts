@@ -5,6 +5,8 @@ import { reactComponentTagger } from 'react-component-tagger';
 export default defineConfig({
   plugins: [react(), reactComponentTagger() as PluginOption],
   build: {
+    outDir: 'dist/client',
+    emptyOutDir: true,
     chunkSizeWarningLimit: 10240,
     rollupOptions: {
       external: ['stripe'],
