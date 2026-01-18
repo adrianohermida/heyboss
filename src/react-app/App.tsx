@@ -29,6 +29,13 @@ const AppointmentsPage = lazy(() => import('./pages/AppointmentsPage'))
 const AuthCallback = lazy(() => import('./pages/AuthCallback'))
 const NotFoundPage = lazy(() => import('./pages/NotFoundPage'))
 
+
+// DEBUG: Logar CSS carregado no modo dev
+if (import.meta.env.DEV) {
+  // eslint-disable-next-line no-console
+  console.log('[DEV] CSS imports ativos:', Array.from(document.styleSheets).map(s => s.href || '[inline]'));
+}
+
 const LoadingFallback = () => (
   <div className="flex items-center justify-center min-h-screen bg-slate-900">
     <div className="text-center">

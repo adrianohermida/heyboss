@@ -1,4 +1,14 @@
     @tailwind base;
+    /* DEBUG: log visual para saber se o CSS foi carregado no dev */
+    body::before {
+      content: "CSS carregado: index.css";
+      display: block;
+      background: #ff0;
+      color: #000;
+      font-size: 10px;
+      padding: 2px 8px;
+      z-index: 9999;
+    }
 @tailwind components;
 @tailwind utilities;
 
